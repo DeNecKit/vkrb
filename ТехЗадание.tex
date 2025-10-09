@@ -130,9 +130,9 @@
 Вызов функции -- это следующее выражение:
 
 \begin{figure}[H]
-	\begin{lstlisting}[language=Lisp]
-		(funcall #'(lambda (p1 ... pn) e1 ... en) a1 ... an)
-	\end{lstlisting}
+\begin{lstlisting}[language=Lisp]
+(funcall #'(lambda (p1 ... pn) e1 ... en) a1 ... an)
+\end{lstlisting}
 \end{figure}
 
 Сначала вычисляются все аргументы a1 ... an. Затем каждому параметру p1 ... pn ставится в соответствие вычисленное значение аргументов a1 ... an. После этого последовательно вычисляются выражения e1 ... en, содержащие параметры, вместо которых будут подставлены их значения.
@@ -142,10 +142,10 @@
 Новую функцию можно создать с помощью оператора defun:
 
 \begin{figure}[H]
-	\begin{lstlisting}[language=Lisp]
-		(defun null (x)
-		  (eq x ()))
-	\end{lstlisting}
+\begin{lstlisting}[language=Lisp]
+(defun null (x)
+  (eq x ()))
+\end{lstlisting}
 \end{figure}
 
 \subsubsection{Глобальные переменные}
@@ -153,10 +153,10 @@
 Глобальные переменные существуют все время работы. Они создаются с помощью функции (defvar имя\_переменной [значение]). Значение может быть выражением:
 
 \begin{figure}[H]
-	\begin{lstlisting}[language=Lisp]
-		(defvar a 10) -> A
-		A -> 10
-	\end{lstlisting}
+\begin{lstlisting}[language=Lisp]
+(defvar a 10) -> A
+A -> 10
+\end{lstlisting}
 \end{figure}
 
 При отсутствии значения в переменную записывается значение NIL.
@@ -164,27 +164,27 @@
 Установить значение переменной можно с помощью функции setq (особая форма). Если такой переменной не было то она создается:
 
 \begin{figure}[H]
-	\begin{lstlisting}[language=Lisp]
-		(setq x 1) -> 1
-		x -> 1
-	\end{lstlisting}
+\begin{lstlisting}[language=Lisp]
+(setq x 1) -> 1
+x -> 1
+\end{lstlisting}
 \end{figure}
 
 Можно одной функцией установить значения нескольких переменных:
 
 \begin{figure}[H]
-	\begin{lstlisting}[language=Lisp]
-		(setq a 1 b 2 c 3)
-	\end{lstlisting}
+\begin{lstlisting}[language=Lisp]
+  (setq a 1 b 2 c 3)
+\end{lstlisting}
 \end{figure}
 
 Если переменная локальная (параметр функции), то setq ее модифицирует:
 
 \begin{figure}[H]
-	\begin{lstlisting}[language=Lisp]
-		(defun test(x)
-		  (setq x 10)) ; модификация параметра
-	\end{lstlisting}
+\begin{lstlisting}[language=Lisp]
+(defun test(x)
+  (setq x 10)) ; модификация параметра
+\end{lstlisting}
 \end{figure}
 
 Глобальные переменные являются динамическими, то есть их значение используется всегда последнее, которое было связано.
@@ -194,52 +194,52 @@
 Макрос задает шаблон для генерации выражения.
 
 \begin{figure}[H]
-	\begin{lstlisting}[language=Lisp]
-		(defmacro test (var val)
-		  (list 'setq var val))
-	\end{lstlisting}
+\begin{lstlisting}[language=Lisp]
+(defmacro test (var val)
+  (list 'setq var val))
+\end{lstlisting}
 \end{figure}
 
 При вызове макроса сначала происходит вычисление тела макроса (развертывание макроса):
 
 \begin{figure}[H]
-	\begin{lstlisting}[language=Lisp]
-		(test abc 100) -> (setq abc 100)
-	\end{lstlisting}
+\begin{lstlisting}[language=Lisp]
+(test abc 100) -> (setq abc 100)
+\end{lstlisting}
 \end{figure}
 
 Затем получившееся выражение вычисляется:
 
 \begin{figure}[H]
-	\begin{lstlisting}[language=Lisp]
-		(setq abc 100) ; abc = 100
-	\end{lstlisting}
+\begin{lstlisting}[language=Lisp]
+(setq abc 100) ; abc = 100
+\end{lstlisting}
 \end{figure}
 
 Обратная кавычка вычисляется как обычное цитирование, но также позволяет указывать, какие части цитирования должны быть вычислены. Эти части указываются с помощью запятой:
 
 \begin{figure}[H]
-	\begin{lstlisting}[language=Lisp]
-		(setq a 10)
-		`(a b c ,a) -> (A B C 10)
-	\end{lstlisting}
+\begin{lstlisting}[language=Lisp]
+(setq a 10)
+`(a b c ,a) -> (A B C 10)
+\end{lstlisting}
 \end{figure}
 
 Запятая-at служит для того, чтобы подставить список (результат вычисления выражения внутри запятой-at должен быть списком):
 
 \begin{figure}[H]
-	\begin{lstlisting}[language=Lisp]
-		(defvar a '(1 2 3)) -> (1 2 3)
-		`(,a ,@a) -> ((1 2 3) 1 2 3)
-	\end{lstlisting}
+\begin{lstlisting}[language=Lisp]
+(defvar a '(1 2 3)) -> (1 2 3)
+`(,a ,@a) -> ((1 2 3) 1 2 3)
+\end{lstlisting}
 \end{figure}
 
 Можно посмотреть результат макроподстановки с помощью функции macroexpand:
 
 \begin{figure}[H]
-	\begin{lstlisting}[language=Lisp]
-		(macroexpand '(if (= 1 1) 2 3)) -> (COND ((= 1 1) 2) (T 3))
-	\end{lstlisting}
+\begin{lstlisting}[language=Lisp]
+(macroexpand '(if (= 1 1) 2 3)) -> (COND ((= 1 1) 2) (T 3))
+\end{lstlisting}
 \end{figure}
 
 \subsubsection{Функции как объекты первого класса}
@@ -253,20 +253,20 @@
 \item лямбда.
 \end{itemize}
 
-Пространство имен функций не совпадает с пространством имен переменных. Функция передается в качестве параметра как лямбда-выражение или символ. Но при вызове функции из параметра мы должны указать, что имя символа (переменная) относится к пространству имен функций. Для вызова функций по параметру используется примитив funcall Пример:
+Пространство имен функций не совпадает с пространством имен переменных. Функция передается в качестве параметра как лямбда-выражение или символ. Но при вызове функции из параметра мы должны указать, что имя символа (переменная) относится к пространству имен функций. Для вызова функций по параметру используется примитив funcall. Пример:
 
 \begin{figure}[H]
-	\begin{lstlisting}[language=Lisp]
-		; вызов примитива
-		(funcall #'+ 1 2 3) -> 6
-		
-		; вызов lambda
-		(funcall #'(lambda (x y) (+ x y)) 2 3) -> 5
-		
-		; вызов пользовательской функции по символу
-		(defun test (x) (+ x 1))
-		(funcall #'test 4) -> 5
-	\end{lstlisting}
+\begin{lstlisting}[language=Lisp]
+; вызов примитива
+(funcall #'+ 1 2 3) -> 6
+
+; вызов lambda
+(funcall #'(lambda (x y) (+ x y)) 2 3) -> 5
+
+; вызов пользовательской функции по символу
+(defun test (x) (+ x 1))
+(funcall #'test 4) -> 5
+\end{lstlisting}
 \end{figure}
 
 Оператор \#' является сокращением специальной формы function, создающей объект-замыкание, в котором сохраняется текущее окружение. При применении функции-замыкания будет использоваться не текущее окружение, а окружение, в котором было создано замыкание. Свободные локальные переменные являются лексическими, то есть сохраняют свое значение, которое было на момент замыкания. Глобальные переменные ведут себя динамическим образом - берется их значение в момент вызова функции.
@@ -276,50 +276,127 @@
 Обработка исключения для выражения:
 
 \begin{figure}[H]
-	\begin{lstlisting}[language=Lisp]
-		(handle <выражение>
-		  (error (<параметры исключения>)
-		    <тело обработчика любых исключений в том числе просто error>)
-		  (division-by-zero (c)
-		    <тело обработчика деления на ноль>)
-		  ...
-		  (<пользовательское исключение> (<параметры>)
-		    <обработчик пользовательского исключения>))
-	\end{lstlisting}
+\begin{lstlisting}[language=Lisp]
+(handle <выражение>
+  (error (<параметры исключения>)
+    <тело обработчика любых исключений в том числе просто error>)
+  (division-by-zero (c)
+    <тело обработчика деления на ноль>)
+  ...
+  (<пользовательское исключение> (<параметры>)
+    <обработчик пользовательского исключения>))
+\end{lstlisting}
 \end{figure}
 
 Для error существует обработчик по умолчанию, который выводит сообщение об ошибке. Примеры ошибок: division-by-zero (деление на ноль), index-error (выход за границы массива). Исключение может быть внутреннее или пользовательское:
 
 \begin{figure}[H]
-	\begin{lstlisting}[language=Lisp]
-		(handle (if nil (raise 'my-error "My error" 20 30))
-		  (my-error (params)
-		    (print params)))
-	\end{lstlisting}
+\begin{lstlisting}[language=Lisp]
+(handle (if nil (raise 'my-error "My error" 20 30))
+  (my-error (params)
+  (print params)))
+\end{lstlisting}
 \end{figure}
 
 \subsection{Программный интерфейс оптимизирующего компилятора}
 
-Программный интерфейс должен состоять из следующих функций:
-\begin{itemize}
-\item (compile expr compiler-optimizations) -- компиляция S-выражения expr в промежуточную форму с флагами оптимизации compiler-optimizations;
-\item (assemble program assembler-optimizations) -- ассемблирование промежуточной формы program с флагами оптимизации assembler-optimizations;
-\item (generate expr generator-optimizations) -- генерация байт-кода из кода ассемблера expr с флагами оптимизации generator-optimizations.
-\end{itemize}
+Программный интерфейс компилятора должен состоять из единственной функции -- (compile expr optimization-flags), которая принимает на вход исходное S-выражение и флаги оптимизации optimization-flags и преобразует его в эквивалентный байт-код для выполнения на виртуальной машине.
 
-Подаваемое на вход функции compile выражение expr должно быть S-выражением; подаваемый на вход assemble program -- S-выражением, являющимся промежуточной формой, получаемой на выходе из функции compile; expr на вход generate -- ассемблер-кодом из функции assemble. Таким образом, эти три функции следует использовать последовательно, подавая результат предыдущей на вход следующей, чтобы провести полный процесс компиляции исходного S-выражения.
+Флаги оптимизации compiler-optimizations должны быть в виде списка символов, каждый из которых включает ту или иную оптимизацию компиляции. Пустой список выключает все оптимизации, специальный символ all -- включает все доступные оптимизации.
 
-Флаги оптимизации compiler-optimizations, assembler-optimizations и generator-optimizations должны быть в виде списков символов, каждый из которых включает ту или иную оптимизацию для данного этапа компиляции. Пустой список выключает все оптимизации, специальный символ all --  включает все доступные оптимизации.
+Результатом функции является массив инструкций для целевой виртуальной машины, список констант, используемых в программе, и размер памяти для глобальных переменных. В случае ошибки компиляции возвращается строка с описанием ошибки.
 
 \subsubsection{Флаги оптимизации компилятора}
 
 Функция compile должна принимать следующие флаги оптимизации:
 
-\begin{enumerate}
-\item accumulator-loading -- оптимизация загрузки регистра аккумулятора (замена в последовательности команд загрузки данных в аккумулятор всех таких команд, кроме последней, пустой командой). Например, последовательность ((CONST 1) (CONST 2) (CONST 3)) заменяется на ((NOP) (NOP) (CONST 3)).
-\item trivial-condition -- оптимизация тривиальных условий. Например, (ALTER (CONST T) expr1 expr2) превращается в expr1.
-\item simplify-arithmetic -- оптимизация арифметических выражений (замена примитивов с произвольным числом аргументов на примитивы с двумя аргументами). Например: (+ 1 2 3 4) становится (+ (+ (+ 1 2) 3) 4).
-\end{enumerate}
+
+
+%\begin{enumerate}
+%\item constant-folding -- оптимизация избыточных вычислений с константами. Пример:
+%\begin{figure}[H]
+%\begin{lstlisting}[language=Lisp]
+%(+ 1 2 3) -> 6
+%\end{lstlisting}
+%\end{figure}
+%
+%\item dead-code-elimination -- удаление выражений, которые не влияют на результат выполнения программы. Пример:
+%\begin{figure}[H]
+%\begin{lstlisting}[language=Lisp]
+%(progn 1 2 3) -> (progn 3)
+%\end{lstlisting}
+%\end{figure}
+%
+%\item unreachable-code-elimination -- удаление недостижимого кода. Пример:
+%\begin{figure}[H]
+%\begin{lstlisting}[language=Lisp]
+%(if t 1 2) -> 1
+%\end{lstlisting}
+%\end{figure}
+%
+%\item inlining -- встраивание функций. Пример:
+%\begin{figure}[H]
+%\begin{lstlisting}[language=Lisp]
+%(progn
+%  (defun f () 5)
+%  (+ (f) 5))
+%->
+%(progn
+%  (+ 5 5))
+%\end{lstlisting}
+%\end{figure}
+%
+%\item tail-call -- оптимизация хвостовой рекурсии. Пример:
+%\begin{figure}[H]
+%\begin{lstlisting}[language=Lisp]
+%(progn
+%  (defun fact (x)
+%    (labels
+%      (inner-fact (x res)
+%        (if (> x 0)
+%          (f (- x 1) (* res x))
+%          res))
+%      (inner-fact x 1))))
+%->
+%(progn
+%  (defun fact (x res)
+%    (tagbody
+%      loop
+%      (when (> x 0)
+%        (setq res (* res x)
+%              x (- x 1))
+%        (go loop))
+%      res))
+%  (fact 5 1))
+%\end{lstlisting}
+%\end{figure}
+%
+%\item common-expression-elimination -- удаление общих подвыражений. Пример:
+%\begin{figure}[H]
+%\begin{lstlisting}[language=Lisp]
+%(defun f (a b)
+%  (let ((c (* a b 2))
+%        (d (* a b 3)))
+%    (+ c d)))
+%->
+%(defun f (a b)
+%  (let ((tmp (* a b)))
+%    (let ((c (* tmp 2))
+%          (d (* tmp 3)))
+%      (+ c d))))
+%\end{lstlisting}
+%\end{figure}
+%
+%\item continuation-passing-style -- представление программы в стиле передачи продолжений. Пример:
+%\begin{figure}[H]
+%\begin{lstlisting}[language=Lisp]
+%(+ 1 2 3)
+%->
+%(+& 1 2 #'(lambda (x)
+%           (+& x 3 #'(lambda (x) x))))
+%\end{lstlisting}
+%\end{figure}
+%\end{enumerate}
 
 \subsection{Требования к оформлению документации}
 
