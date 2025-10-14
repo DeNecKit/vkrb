@@ -310,7 +310,29 @@ x -> 1
 
 Функция compile должна принимать следующие флаги оптимизации:
 
+\begin{enumerate}
+\item accumulator-loading -- удаление подряд идущих обращений к константам или переменным, которые не повлияют на результат вычисления выражения. Пример:
+\begin{figure}[H]
+\begin{lstlisting}[language=Lisp]
+(let ((a 5)) 1 a 2) -> (let ((a 5)) 2)
+\end{lstlisting}
+\end{figure}
 
+\item trivial-condition -- оптимизация тривиальных условий. Пример:
+\begin{figure}[H]
+\begin{lstlisting}[language=Lisp]
+(if t 1 2) -> 1
+\end{lstlisting}
+\end{figure}
+
+\item simplify-arithmetic -- оптимизация арифметических выражений (замена примитивов с произвольным числом аргументов на примитивы с двумя аргументами). Пример:
+\begin{figure}[H]
+\begin{lstlisting}[language=Lisp]
+(+ 1 2 3 4) -> (+ (+ (+ 1 2) 3) 4)
+\end{lstlisting}
+\end{figure}
+
+\end{enumerate}
 
 %\begin{enumerate}
 %\item constant-folding -- оптимизация избыточных вычислений с константами. Пример:
