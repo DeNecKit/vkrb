@@ -253,7 +253,8 @@
         \begin{flushleft}
         \normalsize\noindent\hspace{0.1cm} Оценка \underline{\hspace{5cm}}
         \end{flushleft}
-  \vskip 2em
+        \addtocounter{tablecnt}{-4}
+        \vskip 2em
 }\fi
 \ifВКР{
   \normalsize\fillcenter\Тема\\
@@ -433,12 +434,12 @@
 \setlength  \labelwidth{1.1em}
 \addtolength\leftmargin{\labelwidth}
 \renewcommand\theenumi{\@arabic\c@enumi}
-\renewcommand\theenumii{\@alph\c@enumii}
+\renewcommand\theenumii{\@arabic\c@enumii}
 \renewcommand\theenumiii{\@roman\c@enumiii}
 \renewcommand\theenumiv{\@Alph\c@enumiv}
 \newcommand\labelenumi{\theenumi.}
-\newcommand\labelenumii{(\theenumii)}
-\newcommand\labelenumiii{\theenumiii.}
+\newcommand\labelenumii{\theenumi.\theenumii.}
+\newcommand\labelenumiii{\theenumi.\theenumii.\theenumiii.}
 \newcommand\labelenumiv{\theenumiv.}
 \renewcommand\p@enumii{\theenumi}
 \renewcommand\p@enumiii{\theenumi(\theenumii)}
