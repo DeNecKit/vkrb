@@ -17,7 +17,6 @@
 \item \texttt{optimizer}. Состоит из функции \texttt{(optimize-tree tree flags)}, которая принимает на вход промежуточную форму S-выражения \texttt{tree}, полученную на выходе из функции \texttt{analyze}, и преобразует данную форму, применяя к ней оптимизации, указанные в качестве списка флагов оптимизаций \texttt{flags}, а также вспомогательных функций, отвечающих за конкретные оптимизации. Функция \texttt{opimize-tree} возвращает промежуточную форму с применёнными к ней оптимизациями, которая может остаться без изменений, если ни одна из указанных оптимизаций неприменима к данной промежуточной форме, либо если в качестве списка флагов оптимизаций на вход функции передан пустой список.
 \item \texttt{generator}. Состоит из функции \texttt{(generate tree)}, которая принимает на вход оптимизированную промежуточную форму S-выражения \texttt{tree}, полученную на выходе из функции \texttt{optimize}, и на её основе генерирует код ассемблера, состоящий из мнемоник инструкций, их операторов и меток для инструкций перехода, а также вспомогательных функций для генерации отдельных элементов промежуточной формы. Функция \texttt{generate} возвращает массив мнемоник инструкций, их операндов и меток.
 \item \texttt{assembler}. Состоит из функции \texttt{(assemble code)}, которая принимает на вход ассемблер код -- массив мнемоник инструкций, операндов инструкций и меток для перехода, полученный на выходе из функции \texttt{generate}, и переводит его в байт-код для виртуальной машины, а также других вспомогательных функций. Функция \texttt{assemble} возвращает массив байтов, составляющих искомый байт-код, список констант, используемых в программе, размер памяти для глобальных переменных и таблицу названий функций и их адресов в случае успешного ассемблирования, а в случае ошибки -- вызывает исключение.
-\item \texttt{machine}. Дополнительный модуль, реализующий компиляцию в машинный код для архитектур x86 и x86-64. Состоит из функции \texttt{(assemble-machine)}, которая принимает на вход ассемблер-код для виртуальной машины и преобразовывает его в список инструкций для ассемблера NASM для последующего ассемблирования и компоновки в исполняемый файл, а также других вспомогательных функций. Функция \texttt{assemble-machine} возвращает список линейных команд, соответствующих макросам NASM, которые реализуют команды для поддерживаемых архитектур.
 \end{enumerate}
 
 \subsection{Фаза 1. Макроподстановка}
@@ -425,43 +424,45 @@
 
 \subsubsection{Операции после первой фазы}
 
+В таблице \ref{treecommands:table} представлены все команды, входящие в промежуточное представление.
+
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
 \begin{xltabular}{\textwidth}{|p{6cm}|X|}
-\caption{Операции после первой фазы\label{commands:table}}\\
-\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Операция & \centrow \setlength{\baselineskip}{0.7\baselineskip} Описание операции \\
-\hline \centrow 1 & \centrow 2\\
-\endfirsthead
-\caption*{Продолжение таблицы \ref{commands:table}}\\
-\hline \centrow 1 & \centrow 2\\ \hline
-\finishhead
-\hline NOP & Нет операции \\
-\hline CONST expr & Выражение константа. \\
-\hline GLOBAL-REF i & Обращение к \texttt{i}-той глобальной переменной. \\
-\hline LOCAL-REF j & Обращение к \texttt{j}-той локальной переменной. \\
-\hline DEEP-REF i j & Обращение к дальней свободной переменной. \texttt{i} --  смещение кадра активации, \texttt{j} -- позиция в кадре.\\
-\hline GLOBAL-SET i expr & Присваивание выражения в \texttt{i}-тую глобальную  переменную.\\
-\hline LOCAL-SET j expr & Присваивание выражения в \texttt{j}-тую локальную  переменную.\\
-\hline DEEP-SET i j expr & Присваивание выражения в дальнюю свободную  переменную. \texttt{i} -- смещение кадра активации, \texttt{j} -- позиция в кадре.\\
-\hline SEQ <expr list> & Последовательность вычислений списка выражений. \\
-\hline ALTER cond true false & Условный оператор с выражениями условия,  истины и лжи.\\
-\hline FUNC name body & Функция с именем name и телом \texttt{body}. \\
-\hline LABEL name & Метка с именем \texttt{name}. \\
-\hline FIX-LET num args expr & let форма, \texttt{num} -- число аргументов, \texttt{args} -- список выражений аргументов, \texttt{expr} -- тело lambda.\\
-\hline FIX-CLOSURE name body & Замыкание функции с именем name и телом \texttt{body}.\\
-\hline PRIM-CLOSURE name & Замыкание примитива (фиксированное число аргументов) с именем \texttt{name}.\\
-\hline NPRIM-CLOSURE name & Замыкание примитива (переменное число аргументов) с именем \texttt{name}.\\
-\hline RETURN & Выход из функции.\\
-\hline FIX-CALL name env args & Вызов функции с именем \texttt{name}, номером окружения \texttt{ofs} и списком выражений аргументов \texttt{args} (фиксированное число аргументов).\\
-\hline NARY-CALL name num env args & Вызов функции с именем \texttt{name}, номером окружения \texttt{ofs} и списком выражений аргументов \texttt{args} (переменное число аргументов). \texttt{num} - число фиксированных аргументов.\\
-\hline TAIL-CALL name env args depth & Хвостовой вызов функции с именем \texttt{name}, номером окружения \texttt{env}, списком выражений аргументов \texttt{args} и смещением в окружении вызова функции от её определения \texttt{depth} (фиксированное число аргументов).\\
-\hline TAIL-NCALL name num env args depth & Хвостовой вызов функции с именем \texttt{name}, номером окружения \texttt{env}, списком выражений аргументов \texttt{args} и смещением в окружении вызова функции от её определения \texttt{depth} (переменное число аргументов). \texttt{num} -- число фиксированных аргументов.\\
-\hline FIX-PRIM name args & Вызов примитива (фиксированное число аргументов) с именем \texttt{name} и списком выражений аргументов \texttt{args}.\\
-\hline NARY-PRIM name num args & Вызов примитива (переменное число аргументов) с именем \texttt{name}, числом фиксированных аргументов \texttt{num} и списком выражений аргументов \texttt{args}.\\
-\hline NARY args & Генерация списка необязательных параметров \texttt{args}.\\
-\hline GOTO name & Переход на метку \texttt{name}.\\
-\hline CATCH tag\_exp body\_expr & Блок \texttt{catch} с выражением метки \texttt{tag\_expr} и множеством выражений \texttt{body\_expr}.\\
-\hline THROW tag\_expr ret\_expr & Выход из блока \texttt{catch} с выражением метки \texttt{tag\_expr} и результатом вычислений \texttt{ret\_expr}.\\
-\hline APPLY func args pack & Применение вычисляемой функции \texttt{func} к списку аргументов \texttt{args}, \texttt{pack} -- нужно ли соединить аргументы в список.\\
+	\caption{Операции после первой фазы\label{treecommands:table}}\\
+	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Операция & \centrow \setlength{\baselineskip}{0.7\baselineskip} Описание операции \\
+	\hline \centrow 1 & \centrow 2\\
+	\endfirsthead
+	\caption*{Продолжение таблицы \ref{treecommands:table}}\\
+	\hline \centrow 1 & \centrow 2\\ \hline
+	\finishhead
+	\hline NOP & Нет операции. \\
+	\hline CONST expr & Выражение константа. \\
+	\hline GLOBAL-REF i & Обращение к \texttt{i}-той глобальной переменной. \\
+	\hline LOCAL-REF j & Обращение к \texttt{j}-той локальной переменной. \\
+	\hline DEEP-REF i j & Обращение к дальней свободной переменной. \texttt{i} --  смещение кадра активации, \texttt{j} -- позиция в кадре. \\
+	\hline GLOBAL-SET i expr & Присваивание выражения в \texttt{i}-тую глобальную  переменную. \\
+	\hline LOCAL-SET j expr & Присваивание выражения в \texttt{j}-тую локальную  переменную. \\
+	\hline DEEP-SET i j expr & Присваивание выражения в дальнюю свободную  переменную. \texttt{i} -- смещение кадра активации, \texttt{j} -- позиция в кадре. \\
+	\hline SEQ <expr list> & Последовательность вычислений списка выражений. \\
+	\hline ALTER cond true false & Условный оператор с выражениями условия,  истины и лжи. \\
+	\hline FUNC name body & Функция с именем name и телом \texttt{body}. \\
+	\hline LABEL name & Метка с именем \texttt{name}. \\
+	\hline FIX-LET num args expr & let форма, \texttt{num} -- число аргументов, \texttt{args} -- список выражений аргументов, \texttt{expr} -- тело lambda. \\
+	\hline FIX-CLOSURE name body & Замыкание функции с именем name и телом \texttt{body}. \\
+	\hline PRIM-CLOSURE name & Замыкание примитива (фиксированное число аргументов) с именем \texttt{name}. \\
+	\hline NPRIM-CLOSURE name & Замыкание примитива (переменное число аргументов) с именем \texttt{name}. \\
+	\hline RETURN & Выход из функции. \\
+	\hline FIX-CALL name env args & Вызов функции с именем \texttt{name}, номером окружения \texttt{ofs} и списком выражений аргументов \texttt{args} (фиксированное число аргументов). \\
+	\hline NARY-CALL name num env args & Вызов функции с именем \texttt{name}, номером окружения \texttt{ofs} и списком выражений аргументов \texttt{args} (переменное число аргументов). \texttt{num} - число фиксированных аргументов. \\
+	\hline TAIL-CALL name env args depth & Хвостовой вызов функции с именем \texttt{name}, номером окружения \texttt{env}, списком выражений аргументов \texttt{args} и смещением в окружении вызова функции от её определения \texttt{depth} (фиксированное число аргументов). \\
+	\hline TAIL-NCALL name num env args depth & Хвостовой вызов функции с именем \texttt{name}, номером окружения \texttt{env}, списком выражений аргументов \texttt{args} и смещением в окружении вызова функции от её определения \texttt{depth} (переменное число аргументов). \texttt{num} -- число фиксированных аргументов. \\
+	\hline FIX-PRIM name args & Вызов примитива (фиксированное число аргументов) с именем \texttt{name} и списком выражений аргументов \texttt{args}. \\
+	\hline NARY-PRIM name num args & Вызов примитива (переменное число аргументов) с именем \texttt{name}, числом фиксированных аргументов \texttt{num} и списком выражений аргументов \texttt{args}. \\
+	\hline NARY args & Генерация списка необязательных параметров \texttt{args}. \\
+	\hline GOTO name & Переход на метку \texttt{name}. \\
+	\hline CATCH tag\_exp body\_expr & Блок \texttt{catch} с выражением метки \texttt{tag\_expr} и множеством выражений \texttt{body\_expr}. \\
+	\hline THROW tag\_expr ret\_expr & Выход из блока \texttt{catch} с выражением метки \texttt{tag\_expr} и результатом вычислений \texttt{ret\_expr}. \\
+	\hline APPLY func args pack & Применение вычисляемой функции \texttt{func} к списку аргументов \texttt{args}, \texttt{pack} -- нужно ли соединить аргументы в список. \\
 \end{xltabular}
 \renewcommand{\arraystretch}{1.0} % восстановление сетки
 
@@ -627,7 +628,7 @@
 
 Дерево, полученное на этапе компиляции, преобразуется в ассемблер код -- список инструкций с мнемониками вместо опкодов. Для этого элементы дерева, начиная с самого верхнего, рекурсивно генерируются определённым образом.
 
-Инструкции после генерации:
+Инструкции после генерации представлены в таблице \ref{instructions:table}:
 
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
 \begin{xltabular}{\textwidth}{|p{4.5cm}|X|}
@@ -652,7 +653,7 @@
 	\hline FUNC f & Начало тела функции \texttt{f}. \\
 	\hline LABEL name & Символьная метка. \\
 	\hline JMP label & Безусловный переход на метку \texttt{label}. \\
-	\hline JMPTAIL label & Для машинного кода переход при хвостовом рекурсивном вызове. \\
+	\hline JMPTAIL label & Переход при хвостовом рекурсивном вызове. \\
 	\hline JNT label & Переход на метку если в аккумуляторе \texttt{nil}. \\
 	\hline ALLOC n & Создать новый кадр активации с размером \texttt{n}. Записать туда значения из стека в обратном порядке. \\
 	\hline REG-CALL f & Вызов функции \texttt{f}. \\
@@ -713,6 +714,14 @@
 
 Машина включает в себя память программы (где хранится байт код программы), память констант, память глобальных переменных, стек, список кадров активации и регистры.
 
+На рисунке \ref{vm:image} представлена схема целевой виртуальной машины.
+
+\begin{figure}[H]
+\center{\includegraphics[width=1\linewidth]{vm}}
+\caption{Схема целевой виртуальной машины}
+\label{vm:image}
+\end{figure}
+
 В памяти программы хранятся инструкции программы в виде объектов \texttt{NUMBER}. Каждая команда состоит из кода операции и возможных параметров.
 
 В памяти констант и глобальных переменных могут храниться объекты любых типов.
@@ -721,11 +730,19 @@
 
 Кадры активации представляют собой объекты-массивы.
 
+На рисунке \ref{frames:image} представлена схема кадров активации.
+
+\begin{figure}[H]
+\center{\includegraphics[width=0.5\linewidth]{frames}}
+\caption{Схема кадров активации}
+\label{frames:image}
+\end{figure}
+
 Первый элемент массива -- это ссылка на предыдущий кадр. Следующий элемент служит для ускорения поиска кадра по глубине вызова, здесь хранится номер кадра (глубина вызовов). Остальные элементы массива -- это локальные аргументы. Кадры могут иметь не только линейную, но и древовидную структуру, поэтому необходима ссылка на предыдущий кадр. Такие объекты удобно записывать в стек, восстанавливать из стека. Кадры активации создаются динамически как и другие объекты программы.
 
 Для блоков \texttt{catch} существует отдельный стек, который хранит записи из имени метки, абсолютного адреса конца блока, номера кадра активации, указателя стека.
 
-Регистры машины:
+Регистры машины представлены в таблице \ref{registers:table}.
 
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
 \begin{xltabular}{\textwidth}{|p{4.5cm}|X|}
@@ -746,7 +763,7 @@
 
 Сборка мусора включает в себя фазу пометки и фазу очистки. В фазе пометки помечаются объекты, до которых можно дойти с помощью обхода, начиная с корневых объектов в регистрах. Это регистр аккумулятора \texttt{ACC}, указатель на текущий кадр активации \texttt{FRAME}, все объекты находящиеся в стеке, начиная с текущей позиции \texttt{SP}, а также все объекты в памяти констант и глобальных переменных.
 
-Список инструкций:
+Список инструкций представлен в таблице \ref{vm_instructions:table}.
 
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
 \begin{xltabular}{\textwidth}{|p{0.75cm}|p{4.5cm}|X|}
@@ -877,154 +894,3 @@
 	\hline 11 & error & 0 \\
 \end{xltabular}
 \renewcommand{\arraystretch}{1.0} % восстановление сетки
-
-
-\subsection{Генерация машинного кода}
-
-Генерация машинного кода происходит с помощью ассемблера NASM. Лисп-программа вместо собственного ассемблирования байт кода выдает список команд после генерации. Эти команды преобразовываются в вызовы макросов NASM:
-
-\begin{figure}[H]
-\begin{lstlisting}[language=Lisp]
-(LOCAL-REF 1) -> LOCAL_REF(1)
-(DEEP-REF 0 2) -> DEEP_REF(0, 2)
-(HALT) -> HALT
-\end{lstlisting}
-\end{figure}
-
-После ассемблирования получается объектный файл, который компонуется с главной программой на C. Сгенерированный код находится в ассемблерной функции run, которая вызывается из главной программы.
-
-Трудность генерации для x86-64 заключается в том, что перед инструкцией \texttt{call} требуется, чтобы указатель стека \texttt{RSP} был выровнен по границе 16 байт. Для этого в начале функции добавляется инструкция \texttt{push rbp}, а в конце -- \texttt{pop rbp}. Если число аргументов функции было нечетным, то требуется выравнивание \texttt{sub rsp, 8} перед \texttt{call} и \texttt{add rsp, 8} после. Эти макросы \texttt{ALIGN} и \texttt{UNALIGN} генерирует Лисп-компилятор, используя отдельный модуль \texttt{machine.lsp}.
-
-
-\subsubsection{Распределение регистров и памяти виртуальной машины}
-
-В качестве стека общего назначения используется машинный стек. В качестве регистра аккумулятора используется регистр \texttt{EAX}/\texttt{RAX}. Для регистра текущего кадра окружения и стека \texttt{catch} используем переменные в \texttt{vm.c}. Массивы констант, глобальных переменных выделяются статически в сегменте BSS, таблицы примитивов и стек исключений используются из \texttt{vm.c}.
-
-
-\subsubsection{Реализация команд}
-
-\texttt{PUSH}, \texttt{POP}, \texttt{JMP}, \texttt{JNT}, \texttt{REG\_CALL} имеют прямые аналоги.
-
-\texttt{HALT} -- не генерируется.
-
-\texttt{CONST}, \texttt{LOCAL\_REF}, \texttt{GLOBAL\_REF}, \texttt{DEEP\_REF} / \texttt{SET} -- работаем с массивами из \texttt{vm.c}.
-
-\texttt{FIX-PRIM} -- примитивы вызываются из таблицы примитивов, перед примитивом с нечетным числом аргументов требуется выравнивание и после -- восстановление. Здесь тоже макросы \texttt{ALIGN} и \texttt{UNALIGN} генерирует Лисп-компилятор. Для x86 удобно, когда аргументы генерируются в обратном порядке. В этом случае аргументы уже лежат в стеке в нужном порядке.
-
-Для n-арных примитивов сначала в стек кладутся списочные аргументы в прямом порядке, затем \texttt{PACK}, затем остальные -- в обратном порядке:
-
-\begin{figure}[H]
-\begin{lstlisting}[language=Lisp]
-(print 1 2 3)
--> push 1
-   push 2
-   push 3
-   pack
-   nprim print
-\end{lstlisting}
-\end{figure}
-
-\texttt{FUNC} -- в начале создаём кадр стека (то есть сохраняем предыдущее значение регистра \texttt{BP} в стек и присваиваем ему значение регистра \texttt{SP}) и метку функции. \texttt{RETURN} -- делаем восстановление кадра стека (восстанавливаем значение регистра \texttt{BP} из стека) и \texttt{ret}. \texttt{ALLOC}, \texttt{PACK}, \texttt{FIX\_CLOSURE}, \texttt{SAVE\_FRAME}, \texttt{SET\_FRAME}, \texttt{RESTORE\_FRAME}, \texttt{FIX\_PRIM}, \texttt{NARY\_PRIM}, \texttt{PRIM\_CLOSURE}, \texttt{NPRIM\_CLOSURE}, \texttt{CATCH}, \texttt{THROW}, \texttt{FUNC\_CALL}, \texttt{CHECK\_PRIM}, \texttt{PRIM\_CALL} -- реализуем на ассемблере (аналогично как в \texttt{vm.c}).
-
-При реализации команд важно соблюдать соглашения о регистрах. Для x86 в результате вызова любой функции (например примитива) могут быть перезаписаны регистры \texttt{EAX}, \texttt{ECX}, \texttt{EDX}. В x86-64 могут быть перезаписаны все регистры кроме \texttt{RBX}, \texttt{RSP}, \texttt{RBP}, \texttt{R12}, \texttt{R13}, \texttt{R14}, \texttt{R15}.
-
-
-\subsubsection{Сборка мусора для машинного кода}
-
-Сборщик мусора должен пометить используемые объекты. К ним относятся константы, глобальные переменные, регистр \texttt{frame\_reg}, системный стек и стек \texttt{catch}/\texttt{throw}.
-
-Чтобы пометить системный стек, в начале функции \texttt{run} запоминается текущее значение \texttt{SP} как максимальный адрес стека, который нужно помечать.
-
-Устройство системного стека:
-
-\begin{figure}[H]
-\begin{lstlisting}[language={[x86masm]Assembler}]
-;; Кадр 0
-<BP><адрес возврата><аргументы>
-;; Кадр 1
-<BP><адрес возврата><аргументы>
-\end{lstlisting}
-\end{figure}
-
-Значение \texttt{BP} в кадре указывает на начало текущего кадра (адрес предыдущего сохраненного \texttt{BP}). Для каждого кадра стека помечаются аргументы до адреса предыдущего \texttt{BP}. Само значение \texttt{BP} и адрес возврата пропускается. В режиме x64, в момент сборки мусора аргументы уже извлечены из стека и находятся в регистрах, поэтому нужно помечать регистры.
-
-
-\subsubsection{Пример генерации}
-
-\begin{figure}[H]
-\begin{lstlisting}[language={[x86masm]Assembler}]
-;; константы
-_NULL equ 0
-NULLOBJ equ 4
-MARK_BIT equ 5		; как в objects.h
-PAIR equ 4			; как в objects.h
-ARRAY equ 6			; как в objects.h
-MAX_ARGS equ 16	
-MAX_PAIRS equ (4 * 1024 * 1024)
-GC_PAIRS_THRESHOLD equ (MAX_PAIRS * 9 / 10)
-
-;; внешние символы
-extern t, frame_reg, boot_load, boot_code, parse, prims, nprims, ...
-
-;; подключаем макросы
-%include "macro.inc"
-\end{lstlisting}
-\caption{Пример сгенерированного ассемблер-кода NASM}
-\label{gen1:image}
-\end{figure}
-
-\begin{figure}[H]
-\begin{lstlisting}[language={[x86masm]Assembler}]
-global run, garbage_collect, CONS
-
-section .data
-	global const_text
-	const_text:
-	<строковое представление констант>
-
-section .text
-	;; основная функция программы
-	run:
-	SAVE_REGS
-	push BP
-	mov BP, SP
-	mov [first_frame], BP
-	
-	JMP(G1)
-	FUNC(F1)
-	LOCAL_REF(0)
-	PUSH
-	LOCAL_REF(1)
-	PUSH
-	PRIM(3)
-	RETURN
-	
-	LABEL(G1)
-	JMP(G2)
-	FUNC(F2)
-	LOCAL_REF(0)
-	PUSH
-	ALIGN
-	PRIM(0)
-	UNALIGN
-	RETURN
-
-	LABEL(G2)
-	CONST(0)
-	PUSH
-	CONST(1)
-	PUSH
-	REG_CALL(F1)
-	CONST(3)
-	PUSH
-	ALIGN
-	REG_CALL(F2)
-	UNALIGN
-	
-	pop BP
-	RESTORE_REGS
-	ret
-\end{lstlisting}
-\caption{Пример сгенерированного ассемблер-кода NASM (продолжение)}
-\label{gen2:image}
-\end{figure}
