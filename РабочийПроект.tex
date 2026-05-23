@@ -1,81 +1,481 @@
 \section{Рабочий проект}
-\subsection{Классы, используемые при разработке сайта}
 
-Можно выделить следующий список классов и их методов, использованных при разработке web-приложения (таблица \ref{class:table}). Пример таблицы с уменьшенным межстрочным интервалом.
+В процессе разработки были выделены следующие модули системы: \texttt{common}, \texttt{macro}, \texttt{compiler}, \texttt{optimizer}, \texttt{generator}, \texttt{assembler}.
+
+
+\subsection{Модуль <<common>>}
+
+Описание функций модуля \texttt{common} представлено в таблице \ref{common:table}.
 
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
-\begin{xltabular}{\textwidth}{|X|p{2.5cm}|>{\setlength{\baselineskip}{0.7\baselineskip}}p{4.85cm}|>{\setlength{\baselineskip}{0.7\baselineskip}}p{4.85cm}|}
-\caption{Описание классов Bitrix, используемых в приложении\label{class:table}}\\
-\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Название класса & \centrow \setlength{\baselineskip}{0.7\baselineskip} Модуль, к которому относится класс & \centrow Описание класса & \centrow Методы \\
-\hline \centrow 1 & \centrow 2 & \centrow 3 & \centrow 4\\ \hline
-\endfirsthead
-\caption*{Продолжение таблицы \ref{class:table}}\\
-\hline \centrow 1 & \centrow 2 & \centrow 3 & \centrow 4\\ \hline
-\finishhead
-CMain & Главный модуль & CMain – главный класс страницы web-приложения. После одного из этапов по загрузке страницы в сценарии становится доступным инициализированный системой объект данного класса с именем \$APPLICATION & void ShowTitle(string property\_code = «title», bool strip\_tags = true)
-Выводит заголовок страницы
-void SetTitle(string title)
-Устанавливает заголовок страницы
-
-void ShowCSS(bool external = true, bool XhtmlStyle = true)
-Выводит таблицу стилей CSS страницы\\
-\hline CFile & Главный модуль & CFile – Класс для работы с файлами и изображениями & array GetFileArray (int file\_id)
-Метод возвращает массив, содержащий описание файла (путь к файлу, имя файла, размер) с идентификатором file\_id
+\begin{xltabular}{\textwidth}{|p{2.5cm}|p{2.5cm}|X|}
+	\caption{Описание функций, используемых в модуле \texttt{common}\label{common:table}}\\
+	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Название функции & \centrow Аргументы функции & \centrow Описание функции \\
+	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
+	\endfirsthead
+	\caption*{Продолжение таблицы \ref{common:table}}\\
+	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
+	\finishhead
+	comp-err & msg, \&rest other & Вызывает исключение \texttt{comp-err} с сообщением \texttt{msg} и опциональной дополнительной информацией об ошибке \texttt{other}. \\ \hline
+	is-nary & args & Проверка на присутствие \texttt{\&rest} аргумента в \texttt{args}. \\ \hline
+	mk/add-func & name list \&rest other & Макрос для генерации функции \texttt{name}, добавляющей информацию компиляции функций в список \texttt{list} с дополнительной информацией \texttt{other}. \\ \hline
+	num-fix-args & list num & Определяет число фиксированных аргументов в списке \texttt{list} с начальным значением \texttt{num}. \\ \hline
+	remove-rest & list & Удаляет символ \texttt{\&rest} из списка аргументов \texttt{list}. \\ \hline
+	make-nary-args & count args & Помещает необязательные аргументы из списка \texttt{args}, в котором \texttt{count} обязательных аргументов, в ещё один список. \\ \hline
+	search-symbol & list name & Поиск информации о функции или примитиве с названием \texttt{name} в списке \texttt{list}. \\ \hline
+	correct-lambda & f & Проверка на то, что S-выражение \texttt{f} является корректным лямбда-выражением. \\ \hline
 \end{xltabular}
 \renewcommand{\arraystretch}{1.0} % восстановление сетки
 
-\subsection{Модульное тестирование разработанного web-сайта}
 
-Модульный тест для класса User из модели данных представлен на рисунке \ref{unitUser:image}.
+\subsection{Модуль <<macro>>}
 
-\begin{figure}[ht]
-\begin{lstlisting}[language=Python]
-from django.test import TestCase
-from .models import *
-User = get_user_model()
+Описание функций модуля \texttt{macro} представлено в таблице \ref{macro:table}.
+
+\renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
+\begin{xltabular}{\textwidth}{|p{2.5cm}|p{2.5cm}|X|}
+	\caption{Описание функций, используемых в модуле \texttt{macro}\label{macro:table}}\\
+	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Название функции & \centrow Аргументы функции & \centrow Описание функции \\
+	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
+	\endfirsthead
+	\caption*{Продолжение таблицы \ref{macro:table}}\\
+	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
+	\finishhead
+	add-fix-macro & name env arity args body & Сгенерированная макросом \texttt{mk/add-func} функция для сохранения информации о макросе с фиксированным числом аргументов \texttt{name} с окружением \texttt{env}, арностью \texttt{arity}, параметрами \texttt{args} и телом \texttt{body} в список \texttt{*fix-macros*}. \\ \hline
+	add-nary-macro & name env arity args body & Сгенерированная макросом \texttt{mk/add-func} функция для сохранения информации о макросе с переменным числом аргументов \texttt{name} с окружением \texttt{env}, арностью \texttt{arity}, параметрами \texttt{args} и телом \texttt{body} в список \texttt{*nary-macros*}. \\ \hline
+	make-macro & list & Сохранить информацию о макросе. \texttt{list} -- \texttt{(name args body)}, где \texttt{name} -- название макроса, \texttt{args} -- список параметров макроса, \texttt{body} -- тело макроса. \\ \hline
+	subst & sym env & Подставить значение символа или глобальной переменной \texttt{sym} с окружением \texttt{env}. \\ \hline
+	macro-eval & expr env & Рекурсивное раскрытие макроса \texttt{expr} с окружением \texttt{env}. \\ \hline
+	macro-eval-backquote & expr env & Макровычисление квазицитирования \texttt{expr} с окружением \texttt{env}. \\ \hline
+	macro-eval-if & expr env & Макровычисление условия \texttt{expr} с окружением \texttt{env}. \\ \hline
+	macro-eval-args & args env & Макровычисление списка аргументов \texttt{args} с окружением \texttt{env}. \\ \hline
+	macro-eval-progn & expr env & Макровычисление последовательности \texttt{expr} с окружением \texttt{env}. \\ \hline
+	extend-macro-env & env args vals & Расширение окружения подстановки макросов \texttt{env} символами \texttt{args} и их значениями \texttt{vals}. \\ \hline
+	macro-eval-let & args env & Макровычисление let-выражения \texttt{args} с временным расширением окружения \texttt{env}. \\ \hline
+	macro-eval-app-func & args body vals env & Применение пользовательской функции с параметрами \texttt{args}, телом \texttt{body}, аргументами \texttt{vals} и окружением \texttt{env} внутри макроса. \\ \hline
+	check-arguments & f type count args & Проверка на то, для функции или примитива \texttt{f} типа \texttt{type} список аргументов \texttt{args} имеет правильную длину в сравнении с числом фиксированных аргументов \texttt{count}. \\ \hline
+	macroexpand & args vals body & Раскрытие макроса с параметрами \texttt{args}, аргументами \texttt{vals} и телом \texttt{body}. \\ \hline
+	macro-eval-app & f args env & Макро применение функции, макроса или примитива \texttt{f} с аргументами \texttt{args} и окружением \texttt{env}. \\ \hline
+	macro-eval-funcall & f args env & Макровычисление вызова функции \texttt{f} с аргументами \texttt{args} и окружением \texttt{env}. \\ \hline
+	macro-eval-cond & list env & Макровычисление cond-выражения \texttt{list} с окружением \texttt{env}. \\ \hline
+	macro-eval-setq & var expr env & Присвоение макро символу \texttt{var} значения \texttt{expr} с окружением \texttt{env}. \\ \hline
+	macro-eval-function & s & Макровычисление функционального объекта \texttt{s}. \\ \hline
+	macro-expand-progn & expr env & Макро раскрытие последовательности \texttt{expr} с окружением \texttt{env}. \\ \hline
+\end{xltabular}
+\renewcommand{\arraystretch}{1.0} % восстановление сетки
 
 
-class ShpoTestCases(TestCase):
+\subsection{Модуль <<compiler>>}
 
-    def setUp(self) -> None:
-        self.user = User.objects.create(username='testtestovich', password='testtestovich', first_name='Sad', last_name='')
+Описание функций модуля \texttt{compiler} представлено в таблице \ref{compiler:table}.
 
-    def test_2(self):
+\renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
+\begin{xltabular}{\textwidth}{|p{2.5cm}|p{2.5cm}|X|}
+	\caption{Описание функций, используемых в модуле \texttt{compiler}\label{compiler:table}}\\
+	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Название функции & \centrow Аргументы функции & \centrow Описание функции \\
+	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
+	\endfirsthead
+	\caption*{Продолжение таблицы \ref{compiler:table}}\\
+	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
+	\finishhead
+	extend-env & env args & Расширяет окружение \texttt{env} новым кадром, состоящим из аргументов \texttt{args}. \\ \hline
+	add-func & name env arity args body & Сгенерированная макросом \texttt{mk/add-func} функция для сохранения информации о пользовательских функциях с фиксированным числом аргументов \texttt{name} с окружением \texttt{env}, арностью \texttt{arity}, параметрами \texttt{args} и телом \texttt{body} в список \texttt{*fix-functions*}. \\ \hline
+	add-nary-func & name env arity args body & Сгенерированная макросом \texttt{mk/add-func} функция для сохранения информации о пользовательских функциях с переменным числом аргументов \texttt{name} с окружением \texttt{env}, арностью \texttt{arity}, параметрами \texttt{args} и телом \texttt{body} в список \texttt{*nary-functions*}. \\ \hline
+	add-local-func & name env arity args body & Сгенерированная макросом \texttt{mk/add-func} функция для сохранения информации о локальных функциях \texttt{name} с окружением \texttt{env}, арностью \texttt{arity} и меткой \texttt{real-name} в список \texttt{*local-functions*}. \\ \hline
+	inner-compile & expr env tail & Рекурсивная функция компиляции выражения \texttt{expr} c окружением \texttt{env} в промежуточную форму. \texttt{tail} -- является ли текущее выражение хвостовым. \\ \hline
+	compile-func-body & name args body env & Компиляция тела функции \texttt{name} с параметрами \texttt{args}, телом \texttt{body} и окружением \texttt{env}. \\ \hline
+	compile-lambda & name args body env & Регистрирует функцию \texttt{name} и компилирует её тело \texttt{body}. \texttt{args} -- параметры функции, \texttt{env} -- окружение. \\ \hline
+	find-func & f &  Определение типа функции \texttt{f} и поиск её информации в соответствующем списке. \\ \hline
+	compile-progn & lst env tail & Компилирует блок \texttt{progn} со списком выражений \texttt{lst} и окружением \texttt{env}. \texttt{tail} -- является ли текущее выражение хвостовым. \\ \hline
+	inc-function-ref & name & Увеличить число ссылок на функцию \texttt{name} \\ \hline
+	compile-application & f args env tail & Компиляция применения функции \texttt{f} с аргументами \texttt{args} в окружении \texttt{env}. \texttt{tail} -- является ли текущее выражение хвостовым. \\ \hline
+	compile-function & f env & Компиляция создания замыкания функции \texttt{f} с окружением \texttt{env}. \\ \hline
+	compile-defun & expr env & Компилирует объявление функции \texttt{expr} с помощью \texttt{defun} в окружении \texttt{env}. \\ \hline
+	add-global & sym & Добавляет глобальную переменную \texttt{sym} и возвращает её индекс в списке глобальных переменных \texttt{*global-variables*}. \\ \hline
+	find-global-var & var & Производит поиск переменной в глобальном окружении по символу \texttt{var}. Возвращает индекс в списке глобального окружения, если символ найден, иначе nil. \\ \hline
+	var-search & params var & Вычисление порядкового номера переменной \texttt{var} в списке \texttt{params} с учетом \texttt{\&rest}. \\ \hline
+	find-local-var & var env & Производит поиск переменной в локальном окружении \texttt{env} по символу \texttt{var}. Возвращает индекс переменной в окружении, если символ найден, иначе \texttt{nil}. \\ \hline
+	find-var & var env & Производит поиск переменной по символу \texttt{var} сначала в локальном окружении \texttt{env}, а затем в списке глобальных переменных \texttt{*global-variables*}. Возвращает список, состоящий из символа типа переменной (\texttt{GLOBAL}, \texttt{LOCAL} или \texttt{DEEP}) и индекса переменной. \\ \hline
+	compile-setq & body env & Компилирует setq-выражение с телом \texttt{body} и окружением \texttt{env}. \\ \hline
+	compile-if & expr env tail & Компилирует if-выражение с телом \texttt{expr} и окружением \texttt{env}. \texttt{tail} -- является ли текущее выражение хвостовым. \\ \hline
+	compile-constant & c & Компиляция константы \texttt{c}. \\ \hline
+	compile-labels & lst env tail & Компилирует блок \texttt{labels} с телом \texttt{lst} и окружением \texttt{env}. \texttt{tail} -- является ли текущее выражение хвостовым. \\ \hline
+	compile-variable & v env & Компиляция переменной \texttt{v} в окружении \texttt{env}. \\ \hline
+	compile-backquote & expr env & Компиляция квазицитирования с телом \texttt{expr} и окружением \texttt{env}. \\ \hline
+	compile-tagbody & body env & Компиляция \texttt{tagbody} с телом \texttt{body} и окружением \texttt{env}. \\ \hline
+	compile-catch & args env & Компиляция \texttt{catch} с телом \texttt{args} и окружением \texttt{env}. \\ \hline
+	compile-throw & args env & Компиляция \texttt{throw} с телом \texttt{args} и окружением \texttt{env}. \\ \hline
+	compile-defconst & body env tail & Компиляция \texttt{defconst} с телом \texttt{body} и окружением \texttt{env} и сохранение этой константы в хеше \texttt{*const-vals*}. \texttt{tail} -- является ли текущее выражение хвостовым. \\ \hline
+	compile-apply & func args pack env tail & Компиляция применения функционального объекта \texttt{func} с аргументами \texttt{args} и окружением \texttt{env}. \texttt{pack} -- нужно ли собирать аргументы в список (для примитива \texttt{apply}), \texttt{tail} -- является ли текущее выражение хвостовым. \\ \hline
+	compile-args & args env & Компиляция аргументов \texttt{args} в окружении \texttt{env}. \\ \hline
+	compile & expr & Анализ S-выражения \texttt{expr} и преобразование в эквивалентное выражение, состоящее из более простых операций.
+\end{xltabular}
+\renewcommand{\arraystretch}{1.0} % восстановление сетки
 
-        self.assertEqual(self.user.first_name, 'Sad')
-        self.assertEqual(self.user.last_name, 'Cat')
-        print((self.user))
-        print((self.user.first_name))
-        print((self.user.last_name))
-\end{lstlisting}  
-\caption{Модульный тест класса User}
-\label{unitUser:image}
+
+\subsection{Модуль <<optimizer>>}
+
+Описание функций модуля \texttt{optimizer} представлено в таблице \ref{optimizer:table}.
+
+\renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
+\begin{xltabular}{\textwidth}{|p{2.5cm}|p{2.5cm}|X|}
+	\caption{Описание функций, используемых в модуле \texttt{optimizer}\label{optimizer:table}}\\
+	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Название функции & \centrow Аргументы функции & \centrow Описание функции \\
+	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
+	\endfirsthead
+	\caption*{Продолжение таблицы \ref{optimizer:table}}\\
+	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
+	\finishhead
+	accumulator-loading & tree & Удаляет избыточные формы загрузки значений в аккумулятор. \texttt{tree} -- форма \texttt{SEQ}. \\ \hline
+	trivial-condition & alter & Если условие формы \texttt{ALTER} -- константа, то считает значение условия и сокращает форму \texttt{ALTER} до одной из её веток. \texttt{alter} -- форма \texttt{ALTER}. \\ \hline
+	simplify-arithmetic & tree & Заменяет вызов арифметического примитива \texttt{tree} с неограниченным количеством аргументов на вложенные вызовы примитивов с фиксированным количеством аргументов. \texttt{tree} -- вызов примитива с переменным числом аргументов. \\ \hline
+	constant-folding & tree & Свёртка и распространение констант. \texttt{tree} -- константа или вызов примитива. \\ \hline
+	expand-seqs & tree & Разворачивает вложенные \texttt{SEQ}. \texttt{tree} -- форма \texttt{SEQ}. \\ \hline
+	dead-code-elimination & tree & Убирает из формы \texttt{SEQ} неиспользуемый код (последовательность команд загрузки аккумулятора (кроме последней команды и команды перед \texttt{RETURN})). \\ \hline
+	tail-call & tree & Оптимизация хвостовой рекурсии. \texttt{tree} -- форма \texttt{TAIL-CALL} или \texttt{TAIL-NCALL}. \\ \hline
+	unused-functions & tree & Удаление неиспользуемых функций. \texttt{tree} -- форма \texttt{FUNC}. \\ \hline
+	search-abs-tree & exp nodes & Возвращает истину если найдены хотя бы один узел из списка nodes. \\ \hline
+	one-ref-args & body & Проверка на то, что в теле функции \texttt{body} к каждому аргументу только одно обращение. \\ \hline
+	search-closure-deep-ref & exp & Поиск всех \texttt{FIX-CLOSURE} и проверка каждого тела замыкания на наличие \texttt{DEEP-REF}. \\ \hline
+	beta-exp & exp args level & Выполнить подстановку тела функции \texttt{exp} с аргументами \texttt{args} и номером кадра активации \texttt{level}. \\ \hline
+	make-nary-param & num args & Создать выражение для подстановки аргументов \texttt{args}, \texttt{num} -- число фиксированных аргументов. \\ \hline
+	beta-expansion & call & Подстановка тела функции \texttt{call}, когда функция вызывается один раз и это возможно. \\ \hline
+	can-inline & f & Возможно ли встраивание функции \texttt{f}. \\ \hline
+	side-effects & exp & Есть ли в выражении \texttt{exp} побочные эффекты. \\ \hline
+	optimize-tree1 & tree & Первый проход оптимизации промежуточной формы \texttt{tree}. Возвращает оптимизированное дерево. \\ \hline
+	optimize-tree2 & tree & Второй проход оптимизатора -- встраивание функций, удаление после встраивания. \\ \hline
+	optimize-tree & tree & Оптимизация промежуточной формы \texttt{tree}. \\ \hline
+\end{xltabular}
+\renewcommand{\arraystretch}{1.0} % восстановление сетки
+
+
+\subsection{Модуль <<generator>>}
+
+Описание функций модуля \texttt{generator} представлено в таблице \ref{generator:table}.
+
+\renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
+\begin{xltabular}{\textwidth}{|p{2.5cm}|p{2.5cm}|X|}
+	\caption{Описание функций, используемых в модуле \texttt{generator}\label{generator:table}}\\
+	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Название функции & \centrow Аргументы функции & \centrow Описание функции \\
+	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
+	\endfirsthead
+	\caption*{Продолжение таблицы \ref{generator:table}}\\
+	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
+	\finishhead
+	emit & val & Добавить инструкцию \texttt{val} в массив линейных инструкций \texttt{*program*}. \\ \hline
+	inner-generate & expr & Рекурсивная генерация кода для скомпилированного выражения \texttt{expr}. \\ \hline
+	generate-if & expr & Генерация ветвления. \texttt{expr} -- список из условия, ветки по истине и ветки по лжи. \\ \hline
+	generate-2-params & expr & Генерация функции \texttt{expr} с 2-мя параметрами. \\ \hline
+	generate-deep & i j expr & Генерация формы \texttt{DEEP-SET}. \texttt{i} -- смещение в окружении, \texttt{j} -- индекс в кадре активации, \texttt{expr} -- присваиваемое выражение. \\ \hline
+	generate-set & expr & Генерация форм \texttt{GLOBAL-SET} и \texttt{LOCAL-SET}. \\ \hline
+	generate-args & args set rev & Генерация вычисления аргументов \texttt{args}. \texttt{set} -- тип инструкции для каждого аргумента (например, \texttt{PUSH}), \texttt{rev} -- в обратном порядке. \\ \hline
+	generate-fix-prim & type args & Генерация вызова примитива с фиксированным числом аргументов \texttt{type} и аргументами \texttt{args}. \\ \hline
+	generate-nary-prim & type num args & Генерация вызова примитива с переменным числом аргументов \texttt{type} и аргументами \texttt{args}. \texttt{num} -- число фиксированных аргументов. \\ \hline
+	generate-reg-call & name fix-num env args & Генерация обычного вызова функции \texttt{name} с аргументами \texttt{args} и окружением \texttt{env}. \texttt{fix-num} -- число фиксированных аргументов для функций с переменным числом аргументов. \\ \hline
+	generate-let & count args body & Генерация let-формы с телом \texttt{body} и аргументами \texttt{args}, расширение окружения \texttt{env}. \\ \hline
+	generate-closure & op name env body & Генерация замыкания. \texttt{op} -- инструкция создания замыкания (\texttt{PRIM-CLOSURE, \texttt{NPRIM-CLOSURE} или \texttt{FIX-CLOSURE}}), \texttt{name} -- название функционального объекта, env -- окружение, \texttt{body} -- опциональное тело (для лямбда-выражения). \\ \hline
+	generate-catch & tag body & Генерация формы \texttt{catch} с меткой \texttt{tag} и телом \texttt{body}. \\ \hline
+	generate-throw & tag res & Генерация формы \texttt{throw} с меткой \texttt{tag} и значением \texttt{res}. \\ \hline
+	generate-tail-call & name fix-num depth args & Генерация хвостового вызова функции \texttt{name} с числом фиксированных аргументов \texttt{fix-num}, глубиной вызова относительно входа в функцию \texttt{depth} и аргументами \texttt{args}. \\ \hline
+	generate-nary & args & Генерация списка необязательных аргументов \texttt{args}. \\ \hline
+	generate-apply & func args pack & Генерация применения функции \texttt{func} к аргументам \texttt{args}. \texttt{pack} -- нужно ли объединять аргументы в список (для примитива \texttt{apply}). \\ \hline
+	generate & expr & Генерация кода для скомпилированного выражения \texttt{expr}. \\ \hline
+\end{xltabular}
+\renewcommand{\arraystretch}{1.0} % восстановление сетки
+
+
+\subsection{Модуль <<assembler>>}
+
+Описание функций модуля \texttt{assembler} представлено в таблице \ref{assembler:table}.
+
+\renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
+\begin{xltabular}{\textwidth}{|p{2.5cm}|p{2.5cm}|X|}
+	\caption{Описание функций, используемых в модуле \texttt{assembler}\label{assembler:table}}\\
+	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Название функции & \centrow Аргументы функции & \centrow Описание функции \\
+	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
+	\endfirsthead
+	\caption*{Продолжение таблицы \ref{assembler:table}}\\
+	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
+	\finishhead
+	last-cdr & list & Найти последний \texttt{cdr} в списке \texttt{list}. \\ \hline
+	asm-emit & \&rest bytes & Записать байты \texttt{bytes} в список \texttt{bytecode}. \\ \hline
+	assemble-label & inst & Ассемблирование метки \texttt{inst}. \\ \hline
+	assemble-const & inst & Ассемблирование инструкции загрузки константы \texttt{inst} в \texttt{ACC}. \\ \hline
+	assemble-prim & inst & Ассемблирование инструкции вызова примитива \texttt{inst}. \\ \hline
+	assemble-inst & inst jmp-labels & Ассемблирование инструкции общего вида \texttt{inst}. \\ \hline
+	assemble-first-pass & program & Первый проход ассемблера (замена мнемоник инструкций соответствующими байтами и сбор информации о метках и переходах). \\ \hline
+	assemble-second-pass & first-pass-res & Второй проход ассемблера (замена меток переходов на относительные адреса). \\ \hline
+	assemble & program & Превращает список инструкций с метками \texttt{program} в байт-код. \\ \hline
+\end{xltabular}
+\renewcommand{\arraystretch}{1.0} % восстановление сетки
+
+
+\begin{comment}
+\subsection{Модульное тестирование оптимизатора}
+
+Модульные тесты для фазы оптимизации представлены на рисунках \ref{unit:image}, \ref{unit2:image}.
+
+\begin{figure}[H]
+\lstinputlisting[language=Lisp]{optimizer-tests.lsp}
+\caption{Модульные тесты фазы оптимизации}
+\label{unit:image}
 \end{figure}
 
-\subsection{Системное тестирование разработанного web-сайта}
+\begin{figure}[H]
+\lstinputlisting[language=Lisp]{optimizer-tests2.lsp}
+\caption{Модульные тесты фазы оптимизации (продолжение)}
+\label{unit2:image}
+\end{figure}
 
-На рисунке \ref{main:image} представлена главная страница сайта «Русатом – Аддитивные технологии».
-\newpage % при необходимости можно переносить рисунок на новую страницу
-\begin{figure}[H] % H - рисунок обязательно здесь, или переносится, оставляя пустоту
-\center{\includegraphics[width=1\linewidth]{main1}}
-\center{\includegraphics[width=1\linewidth]{main2}}
-\center{\includegraphics[width=1\linewidth]{main3}}
-\caption{Главная страница сайта «Русатом – Аддитивные технологии»}
+\begin{figure}[H]
+\begin{lstlisting}[language=Lisp]
+(test-compile '((lambda (x) ((lambda (y) (cons x y)) 1)) 2)
+'(FIX-LET 1 ((CONST 2)) (FIX-LET 1 ((CONST 1)) (PRIM CONS ((DEEP-REF 1 0) (LOCAL-REF 0))))))
+
+(test-compile '(progn (defun fac (x) (if (equal x 1) 1 (* x (fac (- x 1))))) (fac 4))
+'(SEQ (LABEL FAC (SEQ (ALTER (PRIM EQUAL ((LOCAL-REF 0) (CONST 1))) (CONST 1) (PRIM * ((LOCAL-REF 0) (REG-CALL FAC 0 ((PRIM - ((LOCAL-REF 0) (CONST 1)))))))) (RETURN))) (REG-CALL FAC 0 ((CONST 4)))))
+
+(test-compile '(setq a #'(lambda (x y) (+ x y)))
+'(GLOBAL-SET 2 (FIX-CLOSURE G598 (LABEL G598 (SEQ (PRIM + ((LOCAL-REF 0) (LOCAL-REF 1))) (RETURN))))))
+
+(test-compile '(progn (defun test () 1) (setq a #'test))
+'(SEQ (LABEL TEST (SEQ (CONST 1) (RETURN))) (GLOBAL-SET 2 (FIX-CLOSURE TEST ()))))
+
+(test-compile '(defun test () #'(lambda (x) x))
+'(LABEL TEST (SEQ (FIX-CLOSURE G711 (LABEL G711 (SEQ (LOCAL-REF 0) (RETURN)))) (RETURN))))
+
+(test-compile '(progn (defmacro test (x y) `(+ ,x ,y)) (test 1 2))
+'(SEQ (NOP) (PRIM + ((CONST 1) (CONST 2)))))
+
+(test-compile '(progn (setq a 1 b 2) `(a (,a) b (,b)))
+'(SEQ (GLOBAL-SET 2 (CONST 1))
+(SEQ (GLOBAL-SET 3 (CONST 2))
+(PRIM CONS ((CONST A)
+(PRIM CONS ((PRIM CONS ((GLOBAL-REF 2)
+(CONST NIL)))
+(PRIM CONS ((CONST B)
+(PRIM CONS ((PRIM CONS ((GLOBAL-REF 3)
+(CONST NIL)))
+(CONST NIL))))))))))))
+\end{lstlisting}  
+\caption{Модульные тесты фазы компиляции (продолжение)}
+\end{figure}
+
+\subsection{Системное тестирование разработанного компилятора}
+
+На рисунках \ref{main:image}, \ref{main2:image} и \ref{main3:image} представлен системный тест компилятора, покрывающий всё реализованное подмножество Common Lisp, на рисунках \ref{main4:image}, \ref{main5:image} и \ref{main6:image} -- результат этого теста.
+\begin{figure}[H]
+\begin{lstlisting}[language=Lisp]
+;; *test-failed* - флаг - провалился ли хотя бы один тест.
+(defvar *test-failed*)
+;; *started-tests-count* - количество запущенных тестов.
+(defvar *test-compile-failed*) ;; TMP
+(defvar *started-tests-count* 0)
+;; *started-tests-count* - количество успешных тестов.
+(defvar *ok-tests-count* 0)
+
+
+;; Тест компиляции, ассемблирования и выполнения программы.
+(defun test (expr expected-res)
+  (unless (= *started-tests-count* *ok-tests-count*)
+    (setq *test-failed* t))
+  (incf *started-tests-count*)
+  (unless (or *test-failed*
+              *test-compile-failed*)
+    (let* ((tree (compile expr))
+           (asmcode (generate tree))
+           (bytecode (assemble asmcode)))
+      (print "Compiler")
+      (labels ((all-atom (lst)
+                 (if (atom lst)
+                     t
+                     (if (atom (car lst))
+                         (all-atom (cdr lst))
+                         nil)))
+               (format-tree (tree indent lparen)
+                 (if (atom tree)
+                     (concat (make-string indent #\ )
+                             (if (> lparen 0) (make-string lparen #\() "")
+                             (cond
+                               ((symbolp tree) (symbol-name tree))
+                               ((integerp tree) (inttostr tree))
+                               (t (error "Unreachable"))))
+                     (let ((res nil))
+                       (setq res (format-tree (car tree) indent (++ lparen)))
+                       (if (all-atom (cdr tree))
+                           (app #'(lambda (elem)
+                                    (setq res (concat res " "
+                                      (cond
+                                        ((symbolp elem) (symbol-name elem))
+                                        ((integerp elem) (inttostr elem))
+                                        (t (error "Unreachable"))))))
+                                (cdr tree))
+                           (app #'(lambda (elem)
+                                    (setq res (concat res "\n" (format-tree elem (++ indent) 0))))
+                                (cdr tree)))
+                       (setq res (concat res ")"))
+                       res))))
+        (print (concat "\n" (format-tree tree 0 0) "\n")))
+\end{lstlisting}
+\caption{Функции для системных тестов}
 \label{main:image}
 \end{figure}
 
-На рисунке \ref{menu:image} представлен динамический вывод заголовков, включающий в себя искомые фразы при поиске фраз.
+\begin{figure}[H]
+\begin{lstlisting}[language=Lisp]
+      (print "Generator")
+      (dolist (inst asmcode)
+        (print inst))
+      (print "Assembler")
+      (print bytecode)
+      (print "Execution")
+      (let ((res (vm-run bytecode)))
+        (print res)
+        (setq res (assert res expected-res))
+        (print res)
+        (if (eq (car res) 'fail)
+            (setq *test-failed* t)
+            (progn
+              (incf *ok-tests-count*)
+              (print '---------------------)))))))
 
-\begin{figure}[ht]
-\center{\includegraphics[width=1\linewidth]{menu}}
-\caption{Динамический вывод заголовков}
-\label{menu:image}
+;; Проверка, все ли тесты успешны
+(defun check-tests ()
+  (when (and (= *started-tests-count* *ok-tests-count*)
+             (null *test-failed*)
+             (null *test-compile-failed*))
+    (print "All tests OK")))
+\end{lstlisting}
+\caption{Функции для системных тестов (продолжение)}
+\label{main2:image}
 \end{figure}
 
-На рисунке \ref{enter:image} представлен ввод данных для публикации новости.
+\begin{figure}[H]
+\begin{lstlisting}[language=Lisp]
+(test
+ '(progn
+   (setq y 3)
+   (defmacro -- (x) `(- ,x 1))
+   (defun f (x)
+     (if (> x 1)
+         (* x (f (-- x)))
+         1))
+   ((lambda (x) (f x)) y))
+ 6)
 
-\begin{figure}[ht]
-\center{\includegraphics[width=1\linewidth]{enter}}
-\caption{Ввод данных для публикации очень-очень длинной, интересной и полезной новости}
-\label{enter:image}
+(check-tests)
+\end{lstlisting}
+\caption{Системный тест компилятора}
+\label{main3:image}
 \end{figure}
+
+\begin{figure}[H]
+\begin{lstlisting}[language=Lisp]
+"Compiler"
+"
+(SEQ
+ (GLOBAL-SET
+  2
+  (CONST 3))
+ (SEQ
+  (NOP)
+  (SEQ
+   (LABEL
+    F
+    (SEQ
+     (ALTER
+      (PRIM
+       >
+       ((LOCAL-REF 0)
+        (CONST 1)))
+      (PRIM
+       *
+       ((LOCAL-REF 0)
+        (REG-CALL
+         F
+         0
+         ((PRIM
+          -
+          ((LOCAL-REF 0)
+           (CONST 1)))))))
+      (CONST 1))
+     (RETURN)))
+   (FIX-LET
+    1
+    ((GLOBAL-REF 2))
+    (REG-CALL
+     F
+     0
+     ((LOCAL-REF 0)))))))
+"
+\end{lstlisting}
+\caption{Результат фазы компиляции системного теста компилятора}
+\label{main4:image}
+\end{figure}
+
+\begin{figure}[H]
+\begin{lstlisting}[language=Lisp]
+"Generator"
+(CONST 3)
+(GLOBAL-SET 2)
+(JMP G41)
+(LABEL F)
+(LOCAL-REF 0)
+(PUSH)
+(CONST 1)
+(PUSH)
+(PRIM >)
+(JNT G54)
+(LOCAL-REF 0)
+(PUSH)
+(LOCAL-REF 0)
+(PUSH)
+(CONST 1)
+(PUSH)
+(PRIM -)
+(PUSH)
+(SAVE-ENV)
+(SET-ENV 0)
+(ALLOC 1)
+(REG-CALL F)
+(RESTORE-ENV)
+(PUSH)
+(PRIM *)
+(JMP G55)
+(LABEL G54)
+(CONST 1)
+(LABEL G55)
+(RETURN)
+(LABEL G41)
+(GLOBAL-REF 2)
+(PUSH)
+(SAVE-ENV)
+(ALLOC 1)
+(LOCAL-REF 0)
+(PUSH)
+(SAVE-ENV)
+(SET-ENV 0)
+(ALLOC 1)
+(REG-CALL F)
+(RESTORE-ENV)
+(RESTORE-ENV)
+\end{lstlisting}
+\caption{Результат фазы генерации системного теста компилятора}
+\label{main5:image}
+\end{figure}
+
+\begin{figure}[H]
+\begin{lstlisting}[language=Lisp]
+"Assembler"
+#(0 3 5 2 1 40 6 0 10 0 1 10 18 13 2 27 6 0 10 6 0 10 0 1 10 18 4 10 14 15 0 3 1 11 -27 16 10 18 5 1 4 0 1 12 4 2 10 14 3 1 6 0 10 14 15 0 3 1 11 -52 16 16)
+"Execution"
+6
+(OK 6 6)
+---------------------
+"All tests OK"
+\end{lstlisting}
+\caption{Результат фазы ассемблирования системного теста компилятора и выполнения полученного байт-кода на целевой машине}
+\label{main6:image}
+\end{figure}
+
+\end{comment}
