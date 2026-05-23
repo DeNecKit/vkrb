@@ -5,6 +5,8 @@
 
 \subsection{Модуль <<common>>}
 
+\texttt{common} -- вспомогательный модуль, содержащий функции, являющиеся общими для нескольких других модулей.
+
 Описание функций модуля \texttt{common} представлено в таблице \ref{common:table}.
 
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
@@ -29,6 +31,8 @@
 
 
 \subsection{Модуль <<macro>>}
+
+\texttt{macro} -- модуль, отвечающий за регистрацию новых и раскрытие существующих макросов. Используется модулем \texttt{compiler} и преобразовывает S-выражения, осуществляя макроподстановку.
 
 Описание функций модуля \texttt{macro} представлено в таблице \ref{macro:table}.
 
@@ -66,6 +70,8 @@
 
 
 \subsection{Модуль <<compiler>>}
+
+\texttt{compiler} -- модуль, отвечающий за обработку исходного S-выражения и его преобразование в промежуточное представление, состоящее из более простых операций. Собирает вспомогательную информацию, такую как число использования тех или иных функций, наличие рекурсии в функциях и т.д., для дальнейшей оптимизации.
 
 Описание функций модуля \texttt{compiler} представлено в таблице \ref{compiler:table}.
 
@@ -115,6 +121,8 @@
 
 \subsection{Модуль <<optimizer>>}
 
+\texttt{optimizer} -- модуль, отвечающий за оптимизацию промежуточной формы. Осуществляет обход дерева в глубину.
+
 Описание функций модуля \texttt{optimizer} представлено в таблице \ref{optimizer:table}.
 
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
@@ -151,6 +159,8 @@
 
 \subsection{Модуль <<generator>>}
 
+\texttt{generator} -- модуль, отвечающий за генерацию линейного кода ассемблера, состоящего из меток и инструкций с мнемониками и операндами.
+
 Описание функций модуля \texttt{generator} представлено в таблице \ref{generator:table}.
 
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
@@ -186,6 +196,8 @@
 
 \subsection{Модуль <<assembler>>}
 
+\texttt{assembler} -- модуль, отвечающий за ассемблирование линейного кода в байт-код виртуальной машины, представляющий собой массив байт.
+
 Описание функций модуля \texttt{assembler} представлено в таблице \ref{assembler:table}.
 
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
@@ -210,272 +222,239 @@
 \renewcommand{\arraystretch}{1.0} % восстановление сетки
 
 
-\begin{comment}
-\subsection{Модульное тестирование оптимизатора}
+\subsection{Модульное тестирование фазы компиляции}
 
-Модульные тесты для фазы оптимизации представлены на рисунках \ref{unit:image}, \ref{unit2:image}.
+Модульные тесты фазы компиляции представлены в таблице \ref{unit_compiler:table}.
 
-\begin{figure}[H]
-\lstinputlisting[language=Lisp]{optimizer-tests.lsp}
-\caption{Модульные тесты фазы оптимизации}
-\label{unit:image}
-\end{figure}
+\renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
+\begin{xltabular}{\textwidth}{|X|X|}
+	\caption{Модульные тесты компилятора\label{unit_compiler:table}}\\
+	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Исходное S-выражение & \centrow \setlength{\baselineskip}{0.7\baselineskip} Ожидаемый результат компиляции \\
+	\hline \centrow 1 & \centrow 2 \\
+	\endfirsthead
+	\caption*{Продолжение таблицы \ref{unit_compiler:table}}\\
+	\hline \centrow 1 & \centrow 2 \\ \hline
+	\finishhead
+	\hline \texttt{(progn 1 2 3)} & \texttt{(SEQ (CONST 1) (SEQ (CONST 2) (CONST 3)))} \\
+	\hline \texttt{(if t (progn 1 2) 3)} & \texttt{(ALTER (GLOBAL-REF 0) (SEQ (CONST 1) (CONST 2)) (CONST 3))} \\
+	\hline \texttt{(setq a (* 2 3))} & \texttt{(GLOBAL-SET 2 (NARY-PRIM * 0 ((CONST 2) (CONST 3))))} \\
+	\hline \texttt{(progn (defun f (x) x) (f 5))} & \texttt{(SEQ (FUNC F (SEQ (LOCAL-REF 0) (RETURN))) (FIX-CALL F 0 ((CONST 5)) ()))} \\
+	\hline \texttt{((lambda (x) ((lambda (y) (print x y)) 10)) 5)} & \texttt{(FIX-LET 1 ((CONST 5)) (FIX-LET 1 ((CONST 10)) (NARY-PRIM PRINT 0 ((DEEP-REF
+		1 0) (LOCAL-REF 0)))))} \\
+	\hline \texttt{(funcall \#'+ 1 2)} & \texttt{(APPLY (NPRIM-CLOSURE +) ((CONST 1) (CONST 2)) T)} \\
+	\hline \texttt{(tagbody (go end) 5 end)} & \texttt{(SEQ (GOTO END) (SEQ (CONST 5) (SEQ (LABEL END) (CONST NIL))))} \\
+	\hline \texttt{(progn (setq a 5) `(a = ,a))} & \texttt{(SEQ (GLOBAL-SET 2 (CONST 5)) (FIX-PRIM CONS ((CONST A) (FIX-PRIM CONS ((CONST =) (FIX-PRIM CONS ((GLOBAL-REF 2) (CONST ()))))))))} \\
+	\hline \texttt{(catch 'err (throw 'err "err"))} & \texttt{(CATCH (CONST ERR) (THROW (CONST ERR) (CONST "err")))} \\
+\end{xltabular}
+\renewcommand{\arraystretch}{1.0} % восстановление сетки
 
-\begin{figure}[H]
-\lstinputlisting[language=Lisp]{optimizer-tests2.lsp}
-\caption{Модульные тесты фазы оптимизации (продолжение)}
-\label{unit2:image}
-\end{figure}
 
-\begin{figure}[H]
-\begin{lstlisting}[language=Lisp]
-(test-compile '((lambda (x) ((lambda (y) (cons x y)) 1)) 2)
-'(FIX-LET 1 ((CONST 2)) (FIX-LET 1 ((CONST 1)) (PRIM CONS ((DEEP-REF 1 0) (LOCAL-REF 0))))))
+\subsection{Модульное тестирование фазы оптимизации}
 
-(test-compile '(progn (defun fac (x) (if (equal x 1) 1 (* x (fac (- x 1))))) (fac 4))
-'(SEQ (LABEL FAC (SEQ (ALTER (PRIM EQUAL ((LOCAL-REF 0) (CONST 1))) (CONST 1) (PRIM * ((LOCAL-REF 0) (REG-CALL FAC 0 ((PRIM - ((LOCAL-REF 0) (CONST 1)))))))) (RETURN))) (REG-CALL FAC 0 ((CONST 4)))))
+Модульные тесты фазы оптимизации представлены в таблице \ref{unit_optimizer:table}.
 
-(test-compile '(setq a #'(lambda (x y) (+ x y)))
-'(GLOBAL-SET 2 (FIX-CLOSURE G598 (LABEL G598 (SEQ (PRIM + ((LOCAL-REF 0) (LOCAL-REF 1))) (RETURN))))))
+\renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
+\begin{xltabular}{\textwidth}{|X|X|}
+	\caption{Модульные тесты оптимизатора\label{unit_optimizer:table}}\\
+	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Исходное выражение & \centrow \setlength{\baselineskip}{0.7\baselineskip} Ожидаемое оптимизированное выражение \\
+	\hline \centrow 1 & \centrow 2 \\
+	\endfirsthead
+	\caption*{Продолжение таблицы \ref{unit_optimizer:table}}\\
+	\hline \centrow 1 & \centrow 2 \\ \hline
+	\finishhead
+	\hline \texttt{(ALTER (CONST T) (CONST 1) (CONST 2))} & \texttt{(CONST 1)} \\
+	\hline \texttt{(NARY-PRIM + 0 ((LOCAL-REF 0) (LOCAL-REF 1)))} & \texttt{(FIX-PRIM + ((LOCAL-REF 0) (LOCAL-REF 1)))} \\
+	\hline \texttt{(SEQ (CONST 1) (CONST 2) (GLOBAL-SET 2 (CONST 3)) (CONST 4) (GLOBAL-REF 2))} & \texttt{(SEQ (GLOBAL-SET 2 (CONST 3)))} \\
+	\hline \texttt{(GLOBAL-SET 2 (FIX-PRIM + ((CONST 1) (CONST 2))))} & \texttt{(GLOBAL-SET 2 (CONST 3))} \\
+	\hline \texttt{(SEQ (FUNC F1 (SEQ (CONST 10) (RETURN))) (FUNC F2 (SEQ (CONST 10) (RETURN))) (FIX-CALL F2 0 () ()))} & \texttt{(CONST 10)} \\
+	\hline \texttt{(SEQ (FUNC LIST (SEQ (SEQ (CONST "Функция создания списка") (LOCAL-REF 0)) (RETURN))) (NARY-CALL LIST 0 0 ((CONST 1) (CONST 2) (CONST 3)) ()))} & \texttt{(NARY ((CONST 1) (CONST 2) (CONST 3)))} \\
+	\hline \texttt{(SEQ (FUNC LIST (SEQ (SEQ (CONST "Функция создания списка") (LOCAL-REF 0)) (RETURN))) (SEQ (FUNC F (SEQ (NARY-PRIM + 0 ((NARY-PRIM * 0 ((FIX-PRIM CAR ((NARY-CALL LIST 0 0 ((CONST 1) (CONST 2) (CONST 3)) ()))) (CONST 2))) (LOCAL-REF 0) (CONST 10))) (RETURN))) (FIX-CALL F 0 ((CONST 5)) ())))} & \texttt{(CONST 17)} \\
+\end{xltabular}
+\renewcommand{\arraystretch}{1.0} % восстановление сетки
 
-(test-compile '(progn (defun test () 1) (setq a #'test))
-'(SEQ (LABEL TEST (SEQ (CONST 1) (RETURN))) (GLOBAL-SET 2 (FIX-CLOSURE TEST ()))))
-
-(test-compile '(defun test () #'(lambda (x) x))
-'(LABEL TEST (SEQ (FIX-CLOSURE G711 (LABEL G711 (SEQ (LOCAL-REF 0) (RETURN)))) (RETURN))))
-
-(test-compile '(progn (defmacro test (x y) `(+ ,x ,y)) (test 1 2))
-'(SEQ (NOP) (PRIM + ((CONST 1) (CONST 2)))))
-
-(test-compile '(progn (setq a 1 b 2) `(a (,a) b (,b)))
-'(SEQ (GLOBAL-SET 2 (CONST 1))
-(SEQ (GLOBAL-SET 3 (CONST 2))
-(PRIM CONS ((CONST A)
-(PRIM CONS ((PRIM CONS ((GLOBAL-REF 2)
-(CONST NIL)))
-(PRIM CONS ((CONST B)
-(PRIM CONS ((PRIM CONS ((GLOBAL-REF 3)
-(CONST NIL)))
-(CONST NIL))))))))))))
-\end{lstlisting}  
-\caption{Модульные тесты фазы компиляции (продолжение)}
-\end{figure}
 
 \subsection{Системное тестирование разработанного компилятора}
 
-На рисунках \ref{main:image}, \ref{main2:image} и \ref{main3:image} представлен системный тест компилятора, покрывающий всё реализованное подмножество Common Lisp, на рисунках \ref{main4:image}, \ref{main5:image} и \ref{main6:image} -- результат этого теста.
+Было проведено системное тестирование разработанного компилятора, покрывающее все фазы компиляции и проверяющее корректность работы скомпилированного кода на тестах библиотек Common Lisp, исчерпывающе покрывающих основные граничные случаи компилятора. Успешным результатом данного тестирования является факт успешного выполнения тестов библиотек на виртуальной машине с помощью байт-кода, сгенерированного компилятором.
+
+
+\subsubsection{Технология системного тестирования}
+
+Для тестирования написана программа на языке C, реализующая виртуальную машину и читающая файл из стандартного потока ввода. Формат входного файла должен включать следующие элементы, разделённые пробелами:
+
+\begin{itemize}
+\item размер байт-кода N (суммарное количество опкодов и операндов);
+\item непосредственно байт-код размером N (N чисел);
+\item массив констант (например, \texttt{\#(T () 0 1 ...)});
+\item размер массива глобальных переменных;
+\item хеш-таблица меток и их адресов (например, \texttt{((ABS . 2) (G314 . 22) (NOT . 27) ...)}).
+\end{itemize}
+
+Пример файла скомпилированной программы \texttt{(print 5)}:
+
 \begin{figure}[H]
-\begin{lstlisting}[language=Lisp]
-;; *test-failed* - флаг - провалился ли хотя бы один тест.
-(defvar *test-failed*)
-;; *started-tests-count* - количество запущенных тестов.
-(defvar *test-compile-failed*) ;; TMP
-(defvar *started-tests-count* 0)
-;; *started-tests-count* - количество успешных тестов.
-(defvar *ok-tests-count* 0)
-
-
-;; Тест компиляции, ассемблирования и выполнения программы.
-(defun test (expr expected-res)
-  (unless (= *started-tests-count* *ok-tests-count*)
-    (setq *test-failed* t))
-  (incf *started-tests-count*)
-  (unless (or *test-failed*
-              *test-compile-failed*)
-    (let* ((tree (compile expr))
-           (asmcode (generate tree))
-           (bytecode (assemble asmcode)))
-      (print "Compiler")
-      (labels ((all-atom (lst)
-                 (if (atom lst)
-                     t
-                     (if (atom (car lst))
-                         (all-atom (cdr lst))
-                         nil)))
-               (format-tree (tree indent lparen)
-                 (if (atom tree)
-                     (concat (make-string indent #\ )
-                             (if (> lparen 0) (make-string lparen #\() "")
-                             (cond
-                               ((symbolp tree) (symbol-name tree))
-                               ((integerp tree) (inttostr tree))
-                               (t (error "Unreachable"))))
-                     (let ((res nil))
-                       (setq res (format-tree (car tree) indent (++ lparen)))
-                       (if (all-atom (cdr tree))
-                           (app #'(lambda (elem)
-                                    (setq res (concat res " "
-                                      (cond
-                                        ((symbolp elem) (symbol-name elem))
-                                        ((integerp elem) (inttostr elem))
-                                        (t (error "Unreachable"))))))
-                                (cdr tree))
-                           (app #'(lambda (elem)
-                                    (setq res (concat res "\n" (format-tree elem (++ indent) 0))))
-                                (cdr tree)))
-                       (setq res (concat res ")"))
-                       res))))
-        (print (concat "\n" (format-tree tree 0 0) "\n")))
+\begin{lstlisting}[language={}]
+8 0 2 10 11 1 19 9 20 #( T () 5 ) 2 ()
 \end{lstlisting}
-\caption{Функции для системных тестов}
-\label{main:image}
 \end{figure}
+
+Здесь \texttt{8} -- размер байт-кода, затем идёт сам байт-код, представляющий собой 8 чисел, потом массив констант -- \texttt{\#( T () 5 )}, размер массива глобальных переменных -- \texttt{2} и хеш-таблица меток и адресов -- \texttt{()}, в данном случае пустая. Таким образом, программа на C загружает все данные из файла, инициализирует состояние виртуальной машины и запускает выполнение байт-кода.
+
+Для удобного автоматического тестирования скомпилирована версия самого компилятора, который загружает S-выражение из массива констант и выполняет дальнейшую компиляцию и печать бинарных данных в выше указанном формате. Константа исходного S-выражения в бинарном файле компилятора имеет следующий вид:
 
 \begin{figure}[H]
 \begin{lstlisting}[language=Lisp]
-      (print "Generator")
-      (dolist (inst asmcode)
-        (print inst))
-      (print "Assembler")
-      (print bytecode)
-      (print "Execution")
-      (let ((res (vm-run bytecode)))
-        (print res)
-        (setq res (assert res expected-res))
-        (print res)
-        (if (eq (car res) 'fail)
-            (setq *test-failed* t)
-            (progn
-              (incf *ok-tests-count*)
-              (print '---------------------)))))))
-
-;; Проверка, все ли тесты успешны
-(defun check-tests ()
-  (when (and (= *started-tests-count* *ok-tests-count*)
-             (null *test-failed*)
-             (null *test-compile-failed*))
-    (print "All tests OK")))
+(PROGN *TARGET*)
 \end{lstlisting}
-\caption{Функции для системных тестов (продолжение)}
-\label{main2:image}
 \end{figure}
+
+При подстановке S-выражения, которое требуется скомпилировать, вместо слова \texttt{*TARGET*}, и выполнения этого бинарного файла на виртуальной машине на выходе появляется бинарный файл скомпилированного исходного S-выражения. Если теперь этот файл выполнить на виртуальной машине, то произойдёт выполнение исходного S-выражения.
+
+С помощью программных утилит, например \texttt{coreutils} (\texttt{cat}, \texttt{sed}), и перенаправления стандартных потоков ввода и вывода можно автоматизировать весь этот процесс компиляции произвольных программ на Common Lisp и их выполнения на виртуальной машине с помощью, например, скриптов \texttt{bash} или \texttt{Makefile}.
+
+
+\subsubsection{Тестирование <<AES>>}
+
+\texttt{aes} -- библиотека, реализующая алгоритм AES для шифрования и дешифрования данных. В ходе тестирования проверяются:
+
+\begin{itemize}
+\item процедура расширения ключа для AES-128;
+\item шифрование и дешифрование AES-128 без дополнения;
+\item шифрование и дешифрование с дополнением по схеме CMS;
+\item корректность формирования и удаления CMS-дополнения при шифровании.
+\end{itemize}
+
+Результаты проведения тестирования на виртуальной машине представлены на рисунке \ref{test-aes:image}.
 
 \begin{figure}[H]
 \begin{lstlisting}[language=Lisp]
-(test
- '(progn
-   (setq y 3)
-   (defmacro -- (x) `(- ,x 1))
-   (defun f (x)
-     (if (> x 1)
-         (* x (f (-- x)))
-         1))
-   ((lambda (x) (f x)) y))
- 6)
-
-(check-tests)
+"Тестирование расширения ключа AES-128"
+(OK #(#(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15) #(214 170 116 253 210 175 114 250 218 166 120 241 214 171 118 254) #(182 146 207 11 100 61 189 241 190 155 197 0 104 48 179 254) #(182 255 116 78 210 194 201 191 108 89 12 191 4 105 191 65) #(71 247 247 188 149 53 62 3 249 108 50 188 253 5 141 253) ...) #(#(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15) #(214 170 116 253 210 175 114 250 218 166 120 241 214 171 118 254) #(182 146 207 11 100 61 189 241 190 155 197 0 104 48 179 254) #(182 255 116 78 210 194 201 191 108 89 12 191 4 105 191 65) #(71 247 247 188 149 53 62 3 249 108 50 188 253 5 141 253) ...))
+"Тесты для AES-128 шифрования и дешифрования"
+(OK #(15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0) #(15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0))
+(OK #(11 14 12 9 1 6 8 13 3 15 2 0 10 7 5 4) #(11 14 12 9 1 6 8 13 3 15 2 0 10 7 5 4))
+"Тестирование шифрования и дешифрования данных с паддингом CMS"
+(OK #(1 2 3 4 5 6 7) #(1 2 3 4 5 6 7))
+(OK #(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19) #(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19))
+"Тест правильности паддинга CMS при шифровании данных"
+(OK #(10 20 30 40 50) #(10 20 30 40 50))
+"Успешно завершено тестов: " 6 / 6
+"Все тесты завершены успешно"
 \end{lstlisting}
-\caption{Системный тест компилятора}
-\label{main3:image}
+\caption{Результаты выполнения тестов AES на виртуальной машине}
+\label{test-aes:image}
 \end{figure}
+
+
+\subsubsection{Тестирование <<regex>>}
+
+\texttt{regex} -- библиотека регулярных выражений. В ходе тестирования проверяется парсинг regex-шаблонов и множество случаев поиска regex-шаблона в строке.
+
+Результаты проведения тестирования на виртуальной машине представлены на рисунке \ref{test-regex:image}.
 
 \begin{figure}[H]
 \begin{lstlisting}[language=Lisp]
-"Compiler"
-"
-(SEQ
- (GLOBAL-SET
-  2
-  (CONST 3))
- (SEQ
-  (NOP)
-  (SEQ
-   (LABEL
-    F
-    (SEQ
-     (ALTER
-      (PRIM
-       >
-       ((LOCAL-REF 0)
-        (CONST 1)))
-      (PRIM
-       *
-       ((LOCAL-REF 0)
-        (REG-CALL
-         F
-         0
-         ((PRIM
-          -
-          ((LOCAL-REF 0)
-           (CONST 1)))))))
-      (CONST 1))
-     (RETURN)))
-   (FIX-LET
-    1
-    ((GLOBAL-REF 2))
-    (REG-CALL
-     F
-     0
-     ((LOCAL-REF 0)))))))
-"
+"Тестирование символа"
+(OK (SYM #\a) (SYM #\a))
+"Тестирование количества"
+(OK (REPEAT 12 ()) (REPEAT 12 ()))
+(OK (REPEAT 12 MORE) (REPEAT 12 MORE))
+(OK (REPEAT 12 50) (REPEAT 12 50))
+"Тестирование количества"
+(OK (RANGE () ((65 ()) (CLASS DIGIT) (CLASS NSPACE) (45 ()) (98 ()))) (RANGE () ((65 ()) (CLASS DIGIT) (CLASS NSPACE) (45 ()) (98 ()))))
+(OK (RANGE NEGATIVE ((65 ()))) (RANGE NEGATIVE ((65 ()))))
+(OK (RANGE () ((65 122) (66 115))) (RANGE () ((65 122) (66 115))))
+"Тестирование квантификатора"
+(OK ((REPEAT 12 ()) LAZY) ((REPEAT 12 ()) LAZY))
+(OK ((PLUS) LAZY) ((PLUS) LAZY))
+(OK ((STAR) LAZY) ((STAR) LAZY))
+"Тестирование элемента"
+(OK (LAZY-STAR (SYM #\+)) (LAZY-STAR (SYM #\+)))
+(OK (OR (EPSILON) (SYM #\b)) (OR (EPSILON) (SYM #\b)))
+(OK (SEQ (SYM #\b) (STAR (...))) (SEQ (SYM #\b) (STAR (SYM #\b))))
+(OK (LAZY-STAR (ANY)) (LAZY-STAR (ANY)))
+...
+"Тестирование регулярных выражений"
+(OK "" "") STRING "a" REGEX "a{0}" GROUPS ()
+(OK "abccccd" "abccccd") STRING "abccccd" REGEX "abc{4}d" GROUPS ()
+(OK "assaaabbaa" "assaaabbaa") STRING "assaaabbaa" REGEX "a+(s*)(a+(b+)a+)" GROUPS ("ss" "aaabbaa" "bb")
+...
+(OK "привет" "привет") STRING "abc_123привет" REGEX "[^A-Za-z0-9_]+" GROUPS ()
+(OK ".*?" ".*?") STRING ".*?" REGEX "\.\*\?" GROUPS ()
+(OK "nonnoncapturinggroups" "nonnoncapturinggroups") STRING "nonnoncapturinggroups" REGEX "(?:non)+(?:capturing)(?:groups)" GROUPS ()
+(OK "134" "134") STRING "_134_" REGEX "(1)(2|34|9)" GROUPS ("1" "34")
+(OK "1345" "1345") STRING "_1345_" REGEX "(1)(34|3|2)(45)" GROUPS ("1" "3" "45")
+...
+"Успешно завершено тестов: " 76 / 76
+"Все тесты завершены успешно"
 \end{lstlisting}
-\caption{Результат фазы компиляции системного теста компилятора}
-\label{main4:image}
+\caption{Результаты выполнения тестов regex на виртуальной машине}
+\label{test-regex:image}
 \end{figure}
+
+
+\subsubsection{Тестирование <<PNG>>}
+
+\texttt{png} -- библиотека для парсинга файлов изображений в формате PNG. В ходе тестирования проверяется успешный разбор PNG-файла.
+
+Результаты проведения тестирования на виртуальной машине представлены на рисунке \ref{test-png:image}.
 
 \begin{figure}[H]
 \begin{lstlisting}[language=Lisp]
-"Generator"
-(CONST 3)
-(GLOBAL-SET 2)
-(JMP G41)
-(LABEL F)
-(LOCAL-REF 0)
-(PUSH)
-(CONST 1)
-(PUSH)
-(PRIM >)
-(JNT G54)
-(LOCAL-REF 0)
-(PUSH)
-(LOCAL-REF 0)
-(PUSH)
-(CONST 1)
-(PUSH)
-(PRIM -)
-(PUSH)
-(SAVE-ENV)
-(SET-ENV 0)
-(ALLOC 1)
-(REG-CALL F)
-(RESTORE-ENV)
-(PUSH)
-(PRIM *)
-(JMP G55)
-(LABEL G54)
-(CONST 1)
-(LABEL G55)
-(RETURN)
-(LABEL G41)
-(GLOBAL-REF 2)
-(PUSH)
-(SAVE-ENV)
-(ALLOC 1)
-(LOCAL-REF 0)
-(PUSH)
-(SAVE-ENV)
-(SET-ENV 0)
-(ALLOC 1)
-(REG-CALL F)
-(RESTORE-ENV)
-(RESTORE-ENV)
+(OK #(#(#(145 99 170 255) #(119 85 177 255) #(189 75 108 255) #(251 186 181 255) #(69 117 255 255) #(176 189 168 255) #(255 235 59 255) #(255 235 59 255)) #(#(41 98 255 255) #(118 117 163 255) #(42 98 254 255) #(97 165 154 255) #(64 148 146 255) #(193 218 108 255) #(255 237 74 255) #(255 237 78 255)) #(#(41 98 255 255) #(229 146 31 255) #(73 105 217 255) #(42 99 253 255) #(76 175 80 255) #(103 187 106 255) #(150 178 255 255) #(66 115 255 255)) #(#(90 134 255 255) #(235 150 32 255) #(99 129 223 255) #(100 162 254 255) #(128 216 255 255) #(128 216 255 255) #(119 205 255 255) #(96 172 255 255)) #(#(131 217 255 255) #(241 159 28 255) #(158 201 195 255) #(137 218 240 255) #(160 221 206 255) #(160 221 206 255) #(160 221 206 255) #(160 221 206 255)) #(#(149 222 255 255) #(241 161 32 255) #(178 218 210 255) #(254 236 64 255) #(255 235 59 255) #(255 235 59 255) #(255 235 59 255) #(255 235 59 255))) #(#(#(145 99 170 255) #(119 85 177 255) #(189 75 108 255) #(251 186 181 255) #(69 117 255 255) #(176 189 168 255) #(255 235 59 255) #(255 235 59 255)) #(#(41 98 255 255) #(118 117 163 255) #(42 98 254 255) #(97 165 154 255) #(64 148 146 255) #(193 218 108 255) #(255 237 74 255) #(255 237 78 255)) #(#(41 98 255 255) #(229 146 31 255) #(73 105 217 255) #(42 99 253 255) #(76 175 80 255) #(103 187 106 255) #(150 178 255 255) #(66 115 255 255)) #(#(90 134 255 255) #(235 150 32 255) #(99 129 223 255) #(100 162 254 255) #(128 216 255 255) #(128 216 255 255) #(119 205 255 255) #(96 172 255 255)) #(#(131 217 255 255) #(241 159 28 255) #(158 201 195 255) #(137 218 240 255) #(160 221 206 255) #(160 221 206 255) #(160 221 206 255) #(160 221 206 255)) #(#(149 222 255 255) #(241 161 32 255) #(178 218 210 255) #(254 236 64 255) #(255 235 59 255) #(255 235 59 255) #(255 235 59 255) #(255 235 59 255))))
+()
+"Успешно завершено тестов: " 1 / 1
+"Все тесты завершены успешно"
 \end{lstlisting}
-\caption{Результат фазы генерации системного теста компилятора}
-\label{main5:image}
+\caption{Результаты выполнения тестов PNG на виртуальной машине}
+\label{test-png:image}
 \end{figure}
+
+
+\subsubsection{Тестирование <<JPEG>>}
+
+\texttt{jpeg} -- библиотека для парсинга файлов изображений в формате JPEG. В ходе тестирования проверяется успешный разбор JPEG-файла.
+
+Результаты проведения тестирования на виртуальной машине представлены на рисунке \ref{test-jpeg:image}.
 
 \begin{figure}[H]
 \begin{lstlisting}[language=Lisp]
-"Assembler"
-#(0 3 5 2 1 40 6 0 10 0 1 10 18 13 2 27 6 0 10 6 0 10 0 1 10 18 4 10 14 15 0 3 1 11 -27 16 10 18 5 1 4 0 1 12 4 2 10 14 3 1 6 0 10 14 15 0 3 1 11 -52 16 16)
-"Execution"
-6
-(OK 6 6)
----------------------
-"All tests OK"
+P3 113 115 255
+#(#(0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 90 36 0 89 36 0 88 36 0 87 36 3 85 36 6 84 36 10 82 36 10 82 36 13 80 36 12 81 36 10 82 36 9 82 36 7 83 36 6 84 36 5 84 36 3 85 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36) #(0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 89 36 0 89 36 0 88 36 0 87 36 3 85 36 6 84 36 9 82 36 9 82 36 12 81 36 10 82 36 9 82 36 7 83 36 6 84 36 5 84 36 3 85 36 2 86 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 0 87 36 ...
 \end{lstlisting}
-\caption{Результат фазы ассемблирования системного теста компилятора и выполнения полученного байт-кода на целевой машине}
-\label{main6:image}
+\caption{Результаты выполнения тестов JPEG на виртуальной машине}
+\label{test-jpeg:image}
 \end{figure}
 
-\end{comment}
+
+\subsubsection{Тестирование <<Lua>>}
+
+\texttt{lua} -- библиотека для трансляции Lua-скриптов в Common Lisp. В ходе тестирования проверяется лексический, синтаксический анализ и трансляция программы на языке Lua в аналогичную программу на Common Lisp.
+
+Результаты проведения тестирования на виртуальной машине представлены на рисунке \ref{test-lua:image}.
+
+\begin{figure}[H]
+\begin{lstlisting}[language=Lisp]
+"Выполняет тест парсинга лексемы переменной"
+(OK ABCDF ABCDF)
+"Выполняет тест парсинга лексемы числа в шестнадцетиричном виде"
+(OK 175 175)
+"Выполняет тест парсинга лексемы числа в шестнадцетиричном виде"
+(OK 175 175)
+"hash test"
+2 2
+(HASH ("a" "first") (1 "second") (2 "third") ("b" "fourth"))
+"Выполняет тест парса функции"
+(FUNCTION (LAMBDA (ARG) (PROGN (LUA-SET (ARG) (100)))))
+"Выполняет тест лексического на Lua в Lisp-выражение"
+(PRINT #\( A #\. B #\. C #\) A LUA-SET #\{ B LUA-SET "1" #\, C LUA-SET "2" #\, 3 #\, 4 #\} #\; ABC LUA-SET 100 END B LUA-SET "aboaasd" C LUA-SET FALSE-CONST LUA-AND NIL-CONST)
+"Выполняет тест преобразования строки на Lua в Lisp-выражение"
+(PROGN (LUA-SET (PERSON) ((LUA-CREATETABLE ()))) (LUA-SET-INDEX PERSON "NEW" (FUNCTION (LAMBDA (NAME AGE) (PROGN (LET ((P (LUA-CREATETABLE ()))) (PROGN (LUA-SET ((LUA-GET-INDEX P "NAME")) (NAME)) (LUA-SET ((LUA-GET-INDEX P "AGE")) (AGE)) (LUA-SET-INDEX P "GET_NAME" (FUNCTION (LAMBDA (SELF) (PROGN (LUA-GET-INDEX SELF "NAME"))))) (LUA-SET-INDEX P "SET_NAME" (FUNCTION (LAMBDA (SELF NAME) (PROGN (LUA-SET ((LUA-GET-INDEX SELF "NAME")) (NAME)))))) (LUA-SET-INDEX P "HELLO" (FUNCTION (LAMBDA (SELF) (PROGN (LUA-CONCAT (LUA-CONCAT (LUA-CONCAT (LUA-CONCAT "Hello, my name is " (LUA-GET-INDEX SELF "NAME")) ", i am ") (LUA-GET-INDEX SELF "AGE")) " years old"))))) P)))))) (LUA-SET (VASYA) ((FUNCALL (LUA-GET-INDEX PERSON "NEW") "Vasya" 30))) (LUA-SET (KOLYA) ((FUNCALL (LUA-GET-INDEX PERSON "NEW") "Kolya" 20))) (LUA-SET (VASYA KOLYA) (KOLYA VASYA)) (FUNCALL PRINT (LET ((__T VASYA)) (FUNCALL (LUA-GET-INDEX __T "HELLO") __T))) (FUNCALL PRINT (LET ((__T KOLYA)) (FUNCALL (LUA-GET-INDEX __T "HELLO") __T))))
+"Выполняет тест исполнения Lisp-выражения, преобразованного из Lua кода"
+(PROGN (LUA-SET (PERSON) ((LUA-CREATETABLE ()))) (LUA-SET-INDEX PERSON "NEW" (FUNCTION (LAMBDA (NAME AGE) (PROGN (LET ((P (LUA-CREATETABLE ()))) (PROGN (LUA-SET ((LUA-GET-INDEX P "NAME")) (NAME)) (LUA-SET ((LUA-GET-INDEX P "AGE")) (AGE)) (LUA-SET-INDEX P "GET_NAME" (FUNCTION (LAMBDA (SELF) (PROGN (LUA-GET-INDEX SELF "NAME"))))) (LUA-SET-INDEX P "SET_NAME" (FUNCTION (LAMBDA (SELF NAME) (PROGN (LUA-SET ((LUA-GET-INDEX SELF "NAME")) (NAME)))))) (LUA-SET-INDEX P "HELLO" (FUNCTION (LAMBDA (SELF) (PROGN (LUA-CONCAT (LUA-CONCAT (LUA-CONCAT (LUA-CONCAT "Hello, my name is " (LUA-GET-INDEX SELF "NAME")) ", i am ") (LUA-GET-INDEX SELF "AGE")) " years old"))))) P)))))) (LUA-SET (VASYA) ((FUNCALL (LUA-GET-INDEX PERSON "NEW") "Vasya" 30))) (LUA-SET (KOLYA) ((FUNCALL (LUA-GET-INDEX PERSON "NEW") "Kolya" 20))) (LUA-SET (VASYA KOLYA) (KOLYA VASYA)) (FUNCALL PRINT (LET ((__T VASYA)) (FUNCALL (LUA-GET-INDEX __T "HELLO") __T))) (FUNCALL PRINT (LET ((__T KOLYA)) (FUNCALL (LUA-GET-INDEX __T "HELLO") __T))))
+"Успешно завершено тестов: " 3 / 3
+"Все тесты завершены успешно"
+\end{lstlisting}
+\caption{Результаты выполнения тестов Lua на виртуальной машине}
+\label{test-lua:image}
+\end{figure}
