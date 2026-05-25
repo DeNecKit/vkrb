@@ -3,15 +3,15 @@
 В процессе разработки были выделены следующие модули системы: \texttt{common}, \texttt{macro}, \texttt{compiler}, \texttt{optimizer}, \texttt{generator}, \texttt{assembler}.
 
 
-\subsection{Модуль <<common>>}
+\subsection{common.lsp}
 
-\texttt{common} -- вспомогательный модуль, содержащий функции, являющиеся общими для нескольких других модулей.
+\texttt{common.lsp} -- вспомогательный модуль, содержащий функции, являющиеся общими для нескольких других модулей.
 
-Описание функций модуля \texttt{common} представлено в таблице \ref{common:table}.
+Описание функций модуля \texttt{common.lsp} представлено в таблице \ref{common:table}.
 
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
 \begin{xltabular}{\textwidth}{|p{2.5cm}|p{2.5cm}|X|}
-	\caption{Описание функций, используемых в модуле \texttt{common}\label{common:table}}\\
+	\caption{Описание функций, используемых в модуле \texttt{common.lsp}\label{common:table}}\\
 	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Название функции & \centrow Аргументы функции & \centrow Описание функции \\
 	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
 	\endfirsthead
@@ -30,15 +30,15 @@
 \renewcommand{\arraystretch}{1.0} % восстановление сетки
 
 
-\subsection{Модуль <<macro>>}
+\subsection{macro.lsp}
 
-\texttt{macro} -- модуль, отвечающий за регистрацию новых и раскрытие существующих макросов. Используется модулем \texttt{compiler} и преобразовывает S-выражения, осуществляя макроподстановку.
+\texttt{macro.lsp} -- модуль, отвечающий за регистрацию новых и раскрытие существующих макросов. Используется модулем \texttt{compiler.lsp} и преобразовывает S-выражения, осуществляя макроподстановку.
 
-Описание функций модуля \texttt{macro} представлено в таблице \ref{macro:table}.
+Описание функций модуля \texttt{macro.lsp} представлено в таблице \ref{macro:table}.
 
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
 \begin{xltabular}{\textwidth}{|p{2.5cm}|p{2.5cm}|X|}
-	\caption{Описание функций, используемых в модуле \texttt{macro}\label{macro:table}}\\
+	\caption{Описание функций, используемых в модуле \texttt{macro.lsp}\label{macro:table}}\\
 	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Название функции & \centrow Аргументы функции & \centrow Описание функции \\
 	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
 	\endfirsthead
@@ -69,15 +69,15 @@
 \renewcommand{\arraystretch}{1.0} % восстановление сетки
 
 
-\subsection{Модуль <<compiler>>}
+\subsection{compiler.lsp}
 
-\texttt{compiler} -- модуль, отвечающий за обработку исходного S-выражения и его преобразование в промежуточное представление, состоящее из более простых операций. Собирает вспомогательную информацию, такую как число использования тех или иных функций, наличие рекурсии в функциях и т.д., для дальнейшей оптимизации.
+\texttt{compiler.lsp} -- модуль, отвечающий за обработку исходного S-выражения и его преобразование в промежуточное представление, состоящее из более простых операций. Собирает вспомогательную информацию, такую как число использования тех или иных функций, наличие рекурсии в функциях и т.д., для дальнейшей оптимизации.
 
-Описание функций модуля \texttt{compiler} представлено в таблице \ref{compiler:table}.
+Описание функций модуля \texttt{compiler.lsp} представлено в таблице \ref{compiler:table}.
 
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
 \begin{xltabular}{\textwidth}{|p{2.5cm}|p{2.5cm}|X|}
-	\caption{Описание функций, используемых в модуле \texttt{compiler}\label{compiler:table}}\\
+	\caption{Описание функций, используемых в модуле \texttt{compiler.lsp}\label{compiler:table}}\\
 	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Название функции & \centrow Аргументы функции & \centrow Описание функции \\
 	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
 	\endfirsthead
@@ -119,15 +119,15 @@
 \renewcommand{\arraystretch}{1.0} % восстановление сетки
 
 
-\subsection{Модуль <<optimizer>>}
+\subsection{optimizer.lsp}
 
-\texttt{optimizer} -- модуль, отвечающий за оптимизацию промежуточной формы. Осуществляет обход дерева в глубину.
+\texttt{optimizer.lsp} -- модуль, отвечающий за оптимизацию промежуточной формы. Осуществляет обход дерева в глубину.
 
-Описание функций модуля \texttt{optimizer} представлено в таблице \ref{optimizer:table}.
+Описание функций модуля \texttt{optimizer.lsp} представлено в таблице \ref{optimizer:table}.
 
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
 \begin{xltabular}{\textwidth}{|p{2.5cm}|p{2.5cm}|X|}
-	\caption{Описание функций, используемых в модуле \texttt{optimizer}\label{optimizer:table}}\\
+	\caption{Описание функций, используемых в модуле \texttt{optimizer.lsp}\label{optimizer:table}}\\
 	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Название функции & \centrow Аргументы функции & \centrow Описание функции \\
 	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
 	\endfirsthead
@@ -157,15 +157,15 @@
 \renewcommand{\arraystretch}{1.0} % восстановление сетки
 
 
-\subsection{Модуль <<generator>>}
+\subsection{generator.lsp}
 
-\texttt{generator} -- модуль, отвечающий за генерацию линейного кода ассемблера, состоящего из меток и инструкций с мнемониками и операндами.
+\texttt{generator.lsp} -- модуль, отвечающий за генерацию линейного кода ассемблера, состоящего из меток и инструкций с мнемониками и операндами.
 
-Описание функций модуля \texttt{generator} представлено в таблице \ref{generator:table}.
+Описание функций модуля \texttt{generator.lsp} представлено в таблице \ref{generator:table}.
 
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
 \begin{xltabular}{\textwidth}{|p{2.5cm}|p{2.5cm}|X|}
-	\caption{Описание функций, используемых в модуле \texttt{generator}\label{generator:table}}\\
+	\caption{Описание функций, используемых в модуле \texttt{generator.lsp}\label{generator:table}}\\
 	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Название функции & \centrow Аргументы функции & \centrow Описание функции \\
 	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
 	\endfirsthead
@@ -194,15 +194,15 @@
 \renewcommand{\arraystretch}{1.0} % восстановление сетки
 
 
-\subsection{Модуль <<assembler>>}
+\subsection{assembler.lsp}
 
-\texttt{assembler} -- модуль, отвечающий за ассемблирование линейного кода в байт-код виртуальной машины, представляющий собой массив байт.
+\texttt{assembler.lsp} -- модуль, отвечающий за ассемблирование линейного кода в байт-код виртуальной машины, представляющий собой массив байт.
 
-Описание функций модуля \texttt{assembler} представлено в таблице \ref{assembler:table}.
+Описание функций модуля \texttt{assembler.lsp} представлено в таблице \ref{assembler:table}.
 
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
 \begin{xltabular}{\textwidth}{|p{2.5cm}|p{2.5cm}|X|}
-	\caption{Описание функций, используемых в модуле \texttt{assembler}\label{assembler:table}}\\
+	\caption{Описание функций, используемых в модуле \texttt{assembler.lsp}\label{assembler:table}}\\
 	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Название функции & \centrow Аргументы функции & \centrow Описание функции \\
 	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
 	\endfirsthead
@@ -227,24 +227,24 @@
 Модульные тесты фазы компиляции представлены в таблице \ref{unit_compiler:table}.
 
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
-\begin{xltabular}{\textwidth}{|X|X|}
+\begin{xltabular}{\textwidth}{|X|X|X|}
 	\caption{Модульные тесты компилятора\label{unit_compiler:table}}\\
-	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Исходное S-выражение & \centrow \setlength{\baselineskip}{0.7\baselineskip} Ожидаемый результат компиляции \\
-	\hline \centrow 1 & \centrow 2 \\
+	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Описание теста & \centrow \setlength{\baselineskip}{0.7\baselineskip} Исходное S-выражение & \centrow \setlength{\baselineskip}{0.7\baselineskip} Ожидаемый результат компиляции \\
+	\hline \centrow 1 & \centrow 2 & \centrow 3 \\
 	\endfirsthead
 	\caption*{Продолжение таблицы \ref{unit_compiler:table}}\\
-	\hline \centrow 1 & \centrow 2 \\ \hline
+	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
 	\finishhead
-	\hline \texttt{(progn 1 2 3)} & \texttt{(SEQ (CONST 1) (SEQ (CONST 2) (CONST 3)))} \\
-	\hline \texttt{(if t (progn 1 2) 3)} & \texttt{(ALTER (GLOBAL-REF 0) (SEQ (CONST 1) (CONST 2)) (CONST 3))} \\
-	\hline \texttt{(setq a (* 2 3))} & \texttt{(GLOBAL-SET 2 (NARY-PRIM * 0 ((CONST 2) (CONST 3))))} \\
-	\hline \texttt{(progn (defun f (x) x) (f 5))} & \texttt{(SEQ (FUNC F (SEQ (LOCAL-REF 0) (RETURN))) (FIX-CALL F 0 ((CONST 5)) ()))} \\
-	\hline \texttt{((lambda (x) ((lambda (y) (print x y)) 10)) 5)} & \texttt{(FIX-LET 1 ((CONST 5)) (FIX-LET 1 ((CONST 10)) (NARY-PRIM PRINT 0 ((DEEP-REF
+	\hline Компиляция \texttt{progn} & \texttt{(progn 1 2 3)} & \texttt{(SEQ (CONST 1) (SEQ (CONST 2) (CONST 3)))} \\
+	\hline Компиляция \texttt{if} & \texttt{(if t (progn 1 2) 3)} & \texttt{(ALTER (GLOBAL-REF 0) (SEQ (CONST 1) (CONST 2)) (CONST 3))} \\
+	\hline Компиляция \texttt{setq} & \texttt{(setq a (* 2 3))} & \texttt{(GLOBAL-SET 2 (NARY-PRIM * 0 ((CONST 2) (CONST 3))))} \\
+	\hline Компиляция объявления и вызова функции & \texttt{(progn (defun f (x) x) (f 5))} & \texttt{(SEQ (FUNC F (SEQ (LOCAL-REF 0) (RETURN))) (FIX-CALL F 0 ((CONST 5)) ()))} \\
+	\hline Компиляция \texttt{let} и обращения к дальней переменной & \texttt{((lambda (x) ((lambda (y) (print x y)) 10)) 5)} & \texttt{(FIX-LET 1 ((CONST 5)) (FIX-LET 1 ((CONST 10)) (NARY-PRIM PRINT 0 ((DEEP-REF
 		1 0) (LOCAL-REF 0)))))} \\
-	\hline \texttt{(funcall \#'+ 1 2)} & \texttt{(APPLY (NPRIM-CLOSURE +) ((CONST 1) (CONST 2)) T)} \\
-	\hline \texttt{(tagbody (go end) 5 end)} & \texttt{(SEQ (GOTO END) (SEQ (CONST 5) (SEQ (LABEL END) (CONST NIL))))} \\
-	\hline \texttt{(progn (setq a 5) `(a = ,a))} & \texttt{(SEQ (GLOBAL-SET 2 (CONST 5)) (FIX-PRIM CONS ((CONST A) (FIX-PRIM CONS ((CONST =) (FIX-PRIM CONS ((GLOBAL-REF 2) (CONST ()))))))))} \\
-	\hline \texttt{(catch 'err (throw 'err "err"))} & \texttt{(CATCH (CONST ERR) (THROW (CONST ERR) (CONST "err")))} \\
+	\hline Компиляция вызова функционального объекта & \texttt{(funcall \#'+ 1 2)} & \texttt{(APPLY (NPRIM-CLOSURE +) ((CONST 1) (CONST 2)) T)} \\
+	\hline Компиляция \texttt{tagbody} & \texttt{(tagbody (go end) 5 end)} & \texttt{(SEQ (GOTO END) (SEQ (CONST 5) (SEQ (LABEL END) (CONST NIL))))} \\
+	\hline Компиляция \texttt{backquote} & \texttt{(progn (setq a 5) `(a = ,a))} & \texttt{(SEQ (GLOBAL-SET 2 (CONST 5)) (FIX-PRIM CONS ((CONST A) (FIX-PRIM CONS ((CONST =) (FIX-PRIM CONS ((GLOBAL-REF 2) (CONST ()))))))))} \\
+	\hline Компиляция \texttt{catch} и \texttt{throw} & \texttt{(catch 'err (throw 'err "err"))} & \texttt{(CATCH (CONST ERR) (THROW (CONST ERR) (CONST "err")))} \\
 \end{xltabular}
 \renewcommand{\arraystretch}{1.0} % восстановление сетки
 
@@ -254,21 +254,21 @@
 Модульные тесты фазы оптимизации представлены в таблице \ref{unit_optimizer:table}.
 
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
-\begin{xltabular}{\textwidth}{|X|X|}
+\begin{xltabular}{\textwidth}{|X|X|X|}
 	\caption{Модульные тесты оптимизатора\label{unit_optimizer:table}}\\
-	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Исходное выражение & \centrow \setlength{\baselineskip}{0.7\baselineskip} Ожидаемое оптимизированное выражение \\
-	\hline \centrow 1 & \centrow 2 \\
+	\hline \centrow \setlength{\baselineskip}{0.7\baselineskip} Описание теста & \centrow \setlength{\baselineskip}{0.7\baselineskip} Исходное выражение & \centrow \setlength{\baselineskip}{0.7\baselineskip} Ожидаемое оптимизированное выражение \\
+	\hline \centrow 1 & \centrow 2 & \centrow 3 \\
 	\endfirsthead
 	\caption*{Продолжение таблицы \ref{unit_optimizer:table}}\\
-	\hline \centrow 1 & \centrow 2 \\ \hline
+	\hline \centrow 1 & \centrow 2 & \centrow 3 \\ \hline
 	\finishhead
-	\hline \texttt{(ALTER (CONST T) (CONST 1) (CONST 2))} & \texttt{(CONST 1)} \\
-	\hline \texttt{(NARY-PRIM + 0 ((LOCAL-REF 0) (LOCAL-REF 1)))} & \texttt{(FIX-PRIM + ((LOCAL-REF 0) (LOCAL-REF 1)))} \\
-	\hline \texttt{(SEQ (CONST 1) (CONST 2) (GLOBAL-SET 2 (CONST 3)) (CONST 4) (GLOBAL-REF 2))} & \texttt{(SEQ (GLOBAL-SET 2 (CONST 3)))} \\
-	\hline \texttt{(GLOBAL-SET 2 (FIX-PRIM + ((CONST 1) (CONST 2))))} & \texttt{(GLOBAL-SET 2 (CONST 3))} \\
-	\hline \texttt{(SEQ (FUNC F1 (SEQ (CONST 10) (RETURN))) (FUNC F2 (SEQ (CONST 10) (RETURN))) (FIX-CALL F2 0 () ()))} & \texttt{(CONST 10)} \\
-	\hline \texttt{(SEQ (FUNC LIST (SEQ (SEQ (CONST "Функция создания списка") (LOCAL-REF 0)) (RETURN))) (NARY-CALL LIST 0 0 ((CONST 1) (CONST 2) (CONST 3)) ()))} & \texttt{(NARY ((CONST 1) (CONST 2) (CONST 3)))} \\
-	\hline \texttt{(SEQ (FUNC LIST (SEQ (SEQ (CONST "Функция создания списка") (LOCAL-REF 0)) (RETURN))) (SEQ (FUNC F (SEQ (NARY-PRIM + 0 ((NARY-PRIM * 0 ((FIX-PRIM CAR ((NARY-CALL LIST 0 0 ((CONST 1) (CONST 2) (CONST 3)) ()))) (CONST 2))) (LOCAL-REF 0) (CONST 10))) (RETURN))) (FIX-CALL F 0 ((CONST 5)) ())))} & \texttt{(CONST 17)} \\
+	\hline Упрощение тривиального условия & \texttt{(ALTER (CONST T) (CONST 1) (CONST 2))} & \texttt{(CONST 1)} \\
+	\hline Оптимизация арифметического выражения & \texttt{(NARY-PRIM + 0 ((LOCAL-REF 0) (LOCAL-REF 1)))} & \texttt{(FIX-PRIM + ((LOCAL-REF 0) (LOCAL-REF 1)))} \\
+	\hline Оптимизация загрузки аккумулятора & \texttt{(SEQ (CONST 1) (CONST 2) (GLOBAL-SET 2 (CONST 3)) (CONST 4) (GLOBAL-REF 2))} & \texttt{(SEQ (GLOBAL-SET 2 (CONST 3)))} \\
+	\hline Свёртка констант & \texttt{(GLOBAL-SET 2 (FIX-PRIM + ((CONST 1) (CONST 2))))} & \texttt{(GLOBAL-SET 2 (CONST 3))} \\
+	\hline Встраивание и удаление функции & \texttt{(SEQ (FUNC LIST (SEQ (SEQ (CONST "Функция создания списка") (LOCAL-REF 0)) (RETURN))) (NARY-CALL LIST 0 0 ((CONST 1) (CONST 2) (CONST 3)) ()))} & \texttt{(NARY ((CONST 1) (CONST 2) (CONST 3)))} \\
+	\hline Встраивание функции и удаление неиспользуемых функций & \texttt{(SEQ (FUNC F1 (SEQ (CONST 10) (RETURN))) (FUNC F2 (SEQ (CONST 10) (RETURN))) (FIX-CALL F2 0 () ()))} & \texttt{(CONST 10)} \\
+	\hline Встраивание функций, удаление неиспользуемых функций и свёртка констант & \texttt{(SEQ (FUNC LIST (SEQ (SEQ (CONST "Функция создания списка") (LOCAL-REF 0)) (RETURN))) (SEQ (FUNC F (SEQ (NARY-PRIM + 0 ((NARY-PRIM * 0 ((FIX-PRIM CAR ((NARY-CALL LIST 0 0 ((CONST 1) (CONST 2) (CONST 3)) ()))) (CONST 2))) (LOCAL-REF 0) (CONST 10))) (RETURN))) (FIX-CALL F 0 ((CONST 5)) ())))} & \texttt{(CONST 17)} \\
 \end{xltabular}
 \renewcommand{\arraystretch}{1.0} % восстановление сетки
 
